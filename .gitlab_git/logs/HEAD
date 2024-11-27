@@ -1,0 +1,8 @@
+0000000000000000000000000000000000000000 6454cc5b2f77394e24463aadd5e19b4aa3cea9f5 Bob <bobberbobston@gmail.com> 1732621656 +0300	commit (initial): Initial commit from Create Next App
+6454cc5b2f77394e24463aadd5e19b4aa3cea9f5 0000000000000000000000000000000000000000 Bob <bobberbobston@gmail.com> 1732726781 +0300	Branch: renamed refs/heads/master to refs/heads/main
+0000000000000000000000000000000000000000 6454cc5b2f77394e24463aadd5e19b4aa3cea9f5 Bob <bobberbobston@gmail.com> 1732726781 +0300	Branch: renamed refs/heads/master to refs/heads/main
+6454cc5b2f77394e24463aadd5e19b4aa3cea9f5 bd060b35320f48a74fc5f9f1cdb12029fd6270c7 Bob <bobberbobston@gmail.com> 1732726819 +0300	commit: init
+bd060b35320f48a74fc5f9f1cdb12029fd6270c7 bd060b35320f48a74fc5f9f1cdb12029fd6270c7 Bob <bobberbobston@gmail.com> 1732726861 +0300	checkout: moving from main to first-barnch
+bd060b35320f48a74fc5f9f1cdb12029fd6270c7 bd060b35320f48a74fc5f9f1cdb12029fd6270c7 Bob <bobberbobston@gmail.com> 1732737856 +0300	checkout: moving from first-barnch to add-drug-and-drop
+bd060b35320f48a74fc5f9f1cdb12029fd6270c7 f6c2eea8f3e0c45b0bce90305dd7ba0c6048738c Bob <bobberbobston@gmail.com> 1732737875 +0300	commit: add drug-and-drop
+f6c2eea8f3e0c45b0bce90305dd7ba0c6048738c 709434156db0481e6895031d267ca0de594b138b Bob <bobberbobston@gmail.com> 1732738779 +0300	commit: drug and drop
