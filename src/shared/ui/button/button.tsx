@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Button as MuiButton} from '@mui/material';
 
-type ButtonProps = React.ComponentProps<typeof MuiButton> & {
+export type ButtonProps = React.ComponentProps<typeof MuiButton> & {
 	isActive?: boolean;
 	label?: string;
 	leftComponent?: React.ReactNode;

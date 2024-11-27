@@ -22,7 +22,7 @@ import 'dayjs/locale/ru';
 // Подключение русской локали
 import updateLocale from 'dayjs/plugin/updateLocale';
 
-import {Button} from '@/shared/ui/button';
+import {Button, ButtonProps} from '@/shared/ui/button';
 
 // Плагин для обновления локали
 dayjs.extend(updateLocale);
@@ -194,9 +194,9 @@ const CustomYearButton = (
 	return (
 		// <div {...props} className="MuiPickersYear-root">
 		<Button
-			{...props}
+			{...(props as unknown as ButtonProps)}
 			className="MuiPickersYear-root"
-			variant="flat"
+			variant="flatted"
 			isActive={props.ownerState.selected}
 			sx={{color: '#1B1F3BCC', fontWeight: '500 !important'}}
 		>
