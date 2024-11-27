@@ -13,11 +13,24 @@ const PageInputs = () => {
 					display: 'flex',
 					flexDirection: 'column',
 					gap: '10px',
+					justifyContent: 'center',
+					alignItems: 'center',
 				}}
 			>
-				<InputField label="Label" placeholder="Placeholder" />
-				<InputField label="Label" placeholder="Placeholder" error="Error" />
-				<InputField label="Label" placeholder="Placeholder" _isFocusedManual />
+				<div
+					style={{
+						display: 'flex',
+						padding: '10px',
+						flexDirection: 'column',
+						gap: '10px',
+						width: '100%',
+						maxWidth: '600px',
+					}}
+				>
+					<InputField label="Label" placeholder="Placeholder" />
+					<InputField label="Label" placeholder="Placeholder" error="Error" />
+					<InputField label="Label" placeholder="Placeholder" _isFocusedManual />
+				</div>
 			</div>
 		</div>
 	);

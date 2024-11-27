@@ -299,39 +299,50 @@ export const PageCalendar = () => {
 	};
 
 	return (
-		<div style={{padding: '50px 10px 10px'}}>
+		<>
 			<Header />
-			<Wrapper>
-				<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
-					<StyledStaticDatePicker
-						showDaysOutsideCurrentMonth
-						fixedWeekNumber={6}
-						slots={{
-							calendarHeader: CustomCalendarHeader,
-							day: CustomDay,
-							yearButton: CustomYearButton,
+
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					gap: '10px',
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}
+			>
+				<Wrapper>
+					<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+						<StyledStaticDatePicker
+							showDaysOutsideCurrentMonth
+							fixedWeekNumber={6}
+							slots={{
+								calendarHeader: CustomCalendarHeader,
+								day: CustomDay,
+								yearButton: CustomYearButton,
+							}}
+							slotProps={{}}
+							value={value}
+							onChange={setValue}
+							views={['year', 'month', 'day']}
+						/>
+					</LocalizationProvider>
+					<div
+						style={{
+							color: '#2EACFB',
+							height: '44px',
+							boxShadow: '0px 1px 0px 0px #DDDFE0 inset',
+							width: '100%',
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
 						}}
-						slotProps={{}}
-						value={value}
-						onChange={setValue}
-						views={['year', 'month', 'day']}
-					/>
-				</LocalizationProvider>
-				<div
-					style={{
-						color: '#2EACFB',
-						height: '44px',
-						boxShadow: '0px 1px 0px 0px #DDDFE0 inset',
-						width: '100%',
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-					}}
-				>
-					<Button onClick={setToday} sx={{width: '100%', padding: '0', height: '100%'}} label="Button" />
-				</div>
-			</Wrapper>
-		</div>
+					>
+						<Button onClick={setToday} sx={{width: '100%', padding: '0', height: '100%'}} label="Button" />
+					</div>
+				</Wrapper>
+			</div>
+		</>
 	);
 };
 

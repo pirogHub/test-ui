@@ -5,7 +5,7 @@ import Link from 'next/link';
 export const Header = () => {
 	return (
 		<div>
-			<ul>
+			<ul style={{display: 'flex', gap: '10px', flexDirection: 'column'}}>
 				<li>
 					<Link href={'/dashboard/page-buttons'}>page-buttons</Link>
 				</li>

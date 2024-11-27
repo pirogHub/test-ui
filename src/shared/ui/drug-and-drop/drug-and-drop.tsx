@@ -41,7 +41,7 @@ const DropArea = styled('div')`
 const FileList = styled('div')`
 	flex: 1;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	gap: 10px;
 `;
 
@@ -81,7 +81,7 @@ export const DrugAndDrop: React.FC = () => {
 			const formData = new FormData();
 			formData.append('file', fileData.file);
 
-			await new Promise((resolve) => setTimeout(resolve, 2000)); // Заменить на реальный запрос, например fetch или axios
+			await new Promise((resolve) => setTimeout(resolve, 1500 + Math.random() * 2000)); // Заменить на реальный запрос, например fetch или axios
 
 			setFiles((prev) =>
 				prev.map((f, i) =>
@@ -109,10 +109,7 @@ export const DrugAndDrop: React.FC = () => {
 		}));
 		setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
 
-		for (let index = 0; index < selectedFiles.length; index++) {
-			const file = selectedFiles[index];
-			await uploadFile(file, files.length + index);
-		}
+		await Promise.all(selectedFiles.map((file, index) => uploadFile(file, files.length + index)));
 	};
 
 	const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
@@ -125,10 +122,7 @@ export const DrugAndDrop: React.FC = () => {
 		}));
 		setFiles((prevFiles) => [...prevFiles, ...droppedFiles]);
 
-		for (let index = 0; index < droppedFiles.length; index++) {
-			const file = droppedFiles[index];
-			await uploadFile(file, files.length + index);
-		}
+		await Promise.all(droppedFiles.map((file, index) => uploadFile(file, files.length + index)));
 	};
 
 	const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -190,7 +184,9 @@ export const DrugAndDrop: React.FC = () => {
 								file.progress === 100 ? (
 									<Icon2 size={20} url={getIconUrlByName('fileIcon')} />
 								) : (
-									<CircularProgress size={16} variant="indeterminate" />
+									<div style={{display: 'flex', alignItems: 'center', width: '20px', height: '20px'}}>
+										<CircularProgress size={16} variant="indeterminate" />
+									</div>
 								)
 							}
 							rightComponent={

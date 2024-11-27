@@ -68,6 +68,7 @@ export default function App({Component, pageProps: {...pageProps}}: AppProps) {
 								backgroundColor: ' rgba(88, 191, 255, 1)',
 							},
 							'&:active, &.active': {
+								backgroundColor: 'rgba(46, 172, 251, 1)',
 								// backgroundColor: '#2EACFB',
 							},
 							'&:disabled, &.disabled': {
