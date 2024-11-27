@@ -9,7 +9,7 @@ import {FlexRow} from '@/shared/ui/layout';
 import Button from './button';
 
 interface TableButtonProps {
-	variant: 'contained' | 'outline' | 'secondary';
+	variant: 'contained' | 'outline' | 'secondary' | 'flatted';
 	size: 'mylarge' | 'mysmall';
 }
 
