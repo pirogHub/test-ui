@@ -4,7 +4,7 @@ import {CircularProgress, styled} from '@mui/material';
 
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 
-import {Badge} from '../badge';
+import {Budge} from '../badge';
 import {Icon2} from '../icon';
 
 const Container = styled('div')`
@@ -174,7 +174,7 @@ export const DrugAndDrop: React.FC = () => {
 					console.log(file.progress);
 
 					return (
-						<Badge
+						<Budge
 							color="rgba(35, 31, 35, 1)"
 							backgroundColor="rgba(245, 245, 245, 1)"
 							key={index}

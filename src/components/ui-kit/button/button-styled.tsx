@@ -95,7 +95,7 @@ const Root = styled('button', {
 	};
 });
 
-interface ButtonProps extends Omit<React.ComponentProps<typeof Root>, Exclude<keyof RootProps, 'sx'>> {
+export interface ButtonProps extends Omit<React.ComponentProps<typeof Root>, Exclude<keyof RootProps, 'sx'>> {
 	view?: ButtonView;
 	size?: ButtonSize;
 	leftIcon?: React.ReactNode;
@@ -155,6 +155,7 @@ export const ButtonStyled = React.forwardRef<HTMLButtonElement, React.PropsWithC
 						style={{
 							display: 'flex',
 							alignItems: 'center',
+							justifyContent: 'center',
 							width: '100%',
 							height: '100%',
 						}}

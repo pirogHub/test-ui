@@ -41,7 +41,7 @@ const Root = styled('div', {
 
 const Text = styled('span')``;
 
-export const Badge: React.FC<React.PropsWithChildren<Props>> = ({
+export const Budge: React.FC<React.PropsWithChildren<Props>> = ({
 	color,
 	rightComponent,
 	backgroundColor,
@@ -55,7 +55,7 @@ export const Badge: React.FC<React.PropsWithChildren<Props>> = ({
 				{leftIcon ? (
 					leftIcon
 				) : leftIcon !== false ? (
-					<Icon2 size={6} color={color} url={getIconUrlByName('pointerLI')} />
+					<Icon2 size={6} color={color} url={getIconUrlByName('pointerLi')} />
 				) : null}
 				<Text>{label || children}</Text>
 				{rightComponent}

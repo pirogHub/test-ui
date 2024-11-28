@@ -3,7 +3,7 @@ const iconsUrlData = {
 	chevronDown: '/img/icons/chevron-down.svg',
 	helpCircle: '/img/icons/help-circle.svg',
 	chest: '/img/icons/chest.svg',
-	pointerLI: '/img/icons/pointer-li.svg',
+	pointerLi: '/img/icons/pointer-li.svg',
 	fileIcon: '/img/icons/file-icon-04.svg',
 };
 
