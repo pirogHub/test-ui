@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Header} from '@/components/header';
+import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
 
 import {InputField} from '@/shared/ui/input';
 
@@ -30,6 +31,11 @@ const PageInputs = () => {
 					<InputField label="Label" placeholder="Placeholder" />
 					<InputField label="Label" placeholder="Placeholder" error="Error" />
 					<InputField label="Label" placeholder="Placeholder" _isFocusedManual />
+					{/* <ButtonStyled>Hello</ButtonStyled>
+					<ButtonStyled active>Hello</ButtonStyled>
+					<ButtonStyled hover>Hello</ButtonStyled>
+					<ButtonStyled disabled>Hello</ButtonStyled>
+					<ButtonStyled size="xl">Hello</ButtonStyled> */}
 				</div>
 			</div>
 		</div>

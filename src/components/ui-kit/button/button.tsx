@@ -31,7 +31,7 @@ const Button: React.FC<React.PropsWithChildren<ButtonProps>> = ({
 	children,
 	leftComponent,
 	rightComponent,
-	isMyRounded,
+	// isRounded,
 	...props
 }) => {
 	const isChildrenExist = label || children;
@@ -39,7 +39,7 @@ const Button: React.FC<React.PropsWithChildren<ButtonProps>> = ({
 
 	const sx = {
 		...(!isChildrenExist ? getOnlyIconStyles(props.size) : {}),
-		...(isMyRounded ? {borderRadius: '50%'} : {}),
+		// ...(isRounded ? {borderRadius: '50%'} : {}),
 		// '& .SkyIcon': {
 		// 	backgroundColor: iconColor,
 		// },

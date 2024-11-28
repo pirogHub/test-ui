@@ -10,12 +10,6 @@
 	}
 }
 
-body {
-	color: var(--foreground);
-	background: var(--background);
-	font-family: Arial, Helvetica, sans-serif;
-}
-
 /* Указываем все шрифты Gilroy в @font-face */
 
 @font-face {
@@ -189,4 +183,16 @@ body {
 	* {
 		scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
 	}
+}
+
+body {
+	transition: all 0.3s ease;
+	color: var(--foreground);
+	background: var(--background);
+	font-family: Gilroy, Helvetica, sans-serif;
+}
+
+body.dark {
+	background: #252525;
+	color: white;
 }

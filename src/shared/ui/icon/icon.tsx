@@ -13,11 +13,6 @@ const Icon = styled('img')<IconProps>(({theme, size = 24}) => ({
 
 export default Icon;
 
-// import {styled} from '@mui/material';
-
-// import {xs} from '../../../components/common/common';
-// import {ReTextColor, themedColor} from '../../../components/design/theme';
-
 type Size = number | {x: number | string; y: number | string};
 
 interface IconProps2 {
@@ -26,8 +21,7 @@ interface IconProps2 {
 	round?: boolean;
 	color?: string;
 	colorActive?: string;
-	// color?: ReTextColor;
-	// colorActive?: ReTextColor;
+
 	colorHex?: string;
 
 	mobileProps?: Partial<Omit<IconProps, 'mobileProps'>>;

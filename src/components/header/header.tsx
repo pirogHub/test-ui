@@ -2,9 +2,14 @@ import React from 'react';
 
 import Link from 'next/link';
 
+import {useThemeToggle} from '@/shared/providers/theme-provider';
+
+import {ButtonStyled} from '../ui-kit/button/button-styled';
+
 export const Header = () => {
+	const {toggleTheme} = useThemeToggle();
 	return (
-		<div>
+		<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
 			<ul style={{display: 'flex', gap: '10px', flexDirection: 'column'}}>
 				<li>
 					<Link href={'/dashboard/page-buttons'}>page-buttons</Link>
@@ -23,6 +28,8 @@ export const Header = () => {
 				</li>
 				{/* <li><Link href={'/dashboard/page-buttons'}></Link></li> */}
 			</ul>
+
+			<ButtonStyled onClick={toggleTheme} label="Toggle theme" />
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 
 import {CircularProgress, styled} from '@mui/material';
 
@@ -134,21 +134,16 @@ export const DrugAndDrop: React.FC = () => {
 		setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
 	};
 
-	// const startUpload = (file: FileData, index: number) => {
-	// 	const interval = setInterval(() => {
-	// 		setFiles((prevFiles) =>
-	// 			prevFiles.map((f, i) =>
-	// 				i === index
-	// 					? {
-	// 							...f,
-	// 							progress: Math.min(f.progress + 10, 100),
-	// 						}
-	// 					: f,
-	// 			),
-	// 		);
-	// 		if (file.progress === 100) clearInterval(interval);
-	// 	}, 300);
-	// };
+	const dragTimer = useRef<NodeJS.Timeout | null>(null);
+
+	const toggleDragStyle = (isOver: boolean) => {
+		if (dragTimer.current) {
+			clearTimeout(dragTimer.current);
+		}
+		dragTimer.current = setTimeout(() => {
+			setIsOnDrugOver(isOver);
+		}, 200);
+	};
 
 	return (
 		<Container>
@@ -157,9 +152,13 @@ export const DrugAndDrop: React.FC = () => {
 				className={isOnDrugOver ? 'onDrugOver' : ''}
 				onDrop={handleDrop}
 				onDragOver={handleDragOver}
-				onDragEnter={() => setIsOnDrugOver(true)}
-				onDragLeave={() => setIsOnDrugOver(false)}
-				onDragEnd={() => setIsOnDrugOver(false)}
+				onDragEnter={() => {
+					toggleDragStyle(true);
+				}}
+				onDragLeave={() => {
+					toggleDragStyle(false);
+				}}
+				// onDragEnd={() => setIsOnDrugOver(false)}
 				onDragExit={() => setIsOnDrugOver(false)}
 				onClick={() => document.getElementById('fileInput')?.click()}
 			>

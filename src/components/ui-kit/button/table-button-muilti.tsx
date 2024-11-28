@@ -7,10 +7,12 @@ import Icon, {Icon2} from '@/shared/ui/icon/icon';
 import {FlexRow} from '@/shared/ui/layout';
 
 import Button from './button';
+import {ButtonSize, ButtonStyled, ButtonView} from './button-styled';
 
 interface TableButtonProps {
-	variant: 'contained' | 'outline' | 'secondary' | 'flatted';
-	size: 'mylarge' | 'mysmall';
+	view: ButtonView;
+	// size: 'mylarge' | 'mysmall';
+	size: ButtonSize;
 }
 
 const states = ['normal', 'hover', 'active', 'disabled'];
@@ -42,150 +44,104 @@ const FourButtonsRow = ({
 		<>
 			<Cell>{rowName}</Cell>
 			<Cell>
-				<Button {...props} label="Button" />
+				<ButtonStyled {...props} label="Button" />
 			</Cell>
 			<Cell>
-				<Button {...props} label="Button" className="hover" />
+				<ButtonStyled {...props} label="Button" className="hover" />
 			</Cell>
 			<Cell>
-				<Button {...props} label="Button" className="active" />
+				<ButtonStyled {...props} label="Button" className="active" />
 			</Cell>
 			<Cell>
-				<Button {...props} label="Button" disabled />
+				<ButtonStyled {...props} label="Button" disabled />
 			</Cell>
 		</>
 	);
 };
 
-const TableButtonMulti = ({variant, size}: TableButtonProps) => {
-	const iconSize = size === 'mylarge' ? 24 : 20;
+const TableButtonMulti = ({view, size}: TableButtonProps) => {
+	const iconSize = size === 'xl' ? 24 : 20;
 
 	return (
 		<>
-			<FourButtonsRow rowName="normal" variant={variant} size={size} />
-			{/* </FlexRow> */}
-			{/* <FlexRow> */}
-			{/* <div>left icon</div> */}
+			<FourButtonsRow rowName="normal" view={view} size={size} />
+
 			<FourButtonsRow
 				rowName="left icon"
-				variant={variant}
+				view={view}
 				size={size}
 				leftComponent={<Icon2 color="red" size={iconSize} url={getIconUrlByName('search')} />}
 			/>
-			{/* <Button
-					leftComponent={<Icon2 color="red" size={iconSize} url={getIconUrlByName('search')} />}
-					size={size}
-					variant={variant}
-					label="Button"
-				/>
-				<Button
-					className="hover"
-					leftComponent={<Icon2 color="red" size={iconSize} url={getIconUrlByName('search')} />}
-					size={size}
-					variant={variant}
-					label="Button"
-				/>
-				<Button
-					className="active"
-					leftComponent={<Icon2 color="red" size={iconSize} url={getIconUrlByName('search')} />}
-					size={size}
-					variant={variant}
-					label="Button"
-				/>
 
-				<Button
-					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
-					disabled
-					size={size}
-					variant={variant}
-					label="Button"
-				/> */}
-			{/* </FlexRow> */}
-			{/* <FlexRow> */}
-			{/* <div>right icon</div> */}
 			<FourButtonsRow
 				rowName="right icon"
-				variant={variant}
+				view={view}
 				size={size}
 				rightComponent={<Icon2 size={iconSize} url={getIconUrlByName('chevronDown')} />}
 			/>
-			{/* <Button
-					rightComponent={<Icon2 size={iconSize} url={getIconUrlByName('chevronDown')} />}
-					size={size}
-					variant={variant}
-					label="Button"
-				/>
-
-				<Button
-					rightComponent={<Icon2 size={iconSize} url={getIconUrlByName('chevronDown')} />}
-					disabled
-					size={size}
-					variant={variant}
-					label="Button"
-				/> */}
 
 			<Cell>only icon</Cell>
 			<Cell sx={{gap: '5px', borderBottom: '1px solid black'}}>
-				<Button
+				<ButtonStyled
 					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
 					size={size}
-					variant={variant}
+					view={view}
 				/>
 
-				<Button
-					isMyRounded
+				<ButtonStyled
+					isRounded
 					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
 					size={size}
-					variant={variant}
+					view={view}
 				/>
 			</Cell>
 			<Cell sx={{gap: '5px', borderBottom: '1px solid black'}}>
-				<Button
+				<ButtonStyled
 					className="hover"
 					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
 					size={size}
-					variant={variant}
+					view={view}
 				/>
 
-				<Button
+				<ButtonStyled
 					className="hover"
-					isMyRounded
+					isRounded
 					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
 					size={size}
-					variant={variant}
+					view={view}
 				/>
 			</Cell>
 			<Cell sx={{gap: '5px', borderBottom: '1px solid black'}}>
-				<Button
+				<ButtonStyled
 					className="active"
 					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
 					size={size}
-					variant={variant}
+					view={view}
 				/>
 
-				<Button
+				<ButtonStyled
 					className="active"
-					isMyRounded
+					isRounded
 					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
 					size={size}
-					variant={variant}
+					view={view}
 				/>
 			</Cell>
 
 			<Cell sx={{gap: '5px', borderBottom: '1px solid black'}}>
-				<Button
+				<ButtonStyled
 					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
 					disabled
 					size={size}
-					variant={variant}
+					view={view}
 				/>
 
-				<Button
-					isMyRounded
+				<ButtonStyled
+					isRounded
 					leftComponent={<Icon2 size={iconSize} url={getIconUrlByName('search')} />}
 					disabled
 					size={size}
-					variant={variant}
+					view={view}
 				/>
 			</Cell>
 		</>
