@@ -3,6 +3,9 @@ import React, {useMemo} from 'react';
 import {skyAllianceMUITheme} from '@/styles/theme';
 import {CSSObject, styled} from '@mui/material';
 
+// import './button-styled-css.scss';
+import styles from '../../../styles/button-styled-css.module.scss';
+
 export type ButtonView = 'primary' | 'secondary' | 'outline' | 'flatted';
 
 export type ButtonSize = 'm' | 'xl';
@@ -53,7 +56,7 @@ const Root = styled('button', {
 	isRounded?: boolean;
 }>(({theme, view, isRounded, size, isOnlyIcon}) => {
 	const map = (theme as skyAllianceMUITheme).skyAlliance.colors[view];
-	console.log('render 111');
+	console.log('render 222');
 
 	const sizeStyles = getButtonSize(size, isRounded, isOnlyIcon);
 
@@ -69,7 +72,7 @@ const Root = styled('button', {
 
 		...sizeStyles,
 		...map.main,
-		// backgroundColor: map.main.backgroundColor,
+		backgroundColor: map.main.backgroundColor,
 
 		'& .SkyIcon': {
 			backgroundColor: map.main.iconColor,
@@ -111,7 +114,7 @@ export interface ButtonProps extends Omit<React.ComponentProps<typeof Root>, Exc
 	isRounded?: boolean;
 }
 
-export const ButtonStyled = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<ButtonProps>>(
+export const ButtonStyledCss = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<ButtonProps>>(
 	(
 		{
 			view = 'primary',
@@ -133,21 +136,32 @@ export const ButtonStyled = React.forwardRef<HTMLButtonElement, React.PropsWithC
 	) => {
 		const finalClassName = useMemo(
 			() =>
-				[className, 'SkyAllianceButton', active ? 'active' : '', hover ? 'hover' : '']
+				[
+					//
+					className,
+					styles.SkyAllianceButtonCss,
+					active ? 'active' : '',
+					hover ? 'hover' : '',
+					`size-${size}`,
+					view,
+				]
 					.filter(Boolean)
 					.join(' '),
 			[className, active, hover],
 		);
 		const isChildrenExist = label || children;
+
+		console.log('render button css');
+
 		return (
-			<Root
+			<button
 				isOnlyIcon={!isChildrenExist}
 				className={finalClassName}
 				ref={ref}
-				view={view}
-				size={size}
+				// view={view}
+				// size={size}
 				onClick={onClick}
-				sx={sx}
+				// sx={sx}
 				{...props}
 			>
 				{leftComponent ? leftComponent : null}
@@ -165,8 +179,8 @@ export const ButtonStyled = React.forwardRef<HTMLButtonElement, React.PropsWithC
 					</div>
 				) : null}
 				{rightComponent ? rightComponent : null}
-			</Root>
+			</button>
 		);
 	},
 );
-ButtonStyled.displayName = 'ButtonStyled';
+ButtonStyledCss.displayName = 'ButtonStyledCss';

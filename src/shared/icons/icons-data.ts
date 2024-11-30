@@ -1,10 +1,16 @@
 const iconsUrlData = {
+	// TODO сделать автосорт по алфавиту
 	search: '/img/icons/search-sm.svg',
 	chevronDown: '/img/icons/chevron-down.svg',
 	helpCircle: '/img/icons/help-circle.svg',
 	chest: '/img/icons/chest.svg',
 	pointerLi: '/img/icons/pointer-li.svg',
 	fileIcon: '/img/icons/file-icon-04.svg',
+	eyeOff: '/img/icons/eye-off.svg',
+	eyeOn: '/img/icons/eye-on.svg',
+
+	// SkyLogo: '/img/brand/Logo.svg',
+	SkyLogo: '/img/brand/Logo.png',
 };
 
 export type MyIconName = keyof typeof iconsUrlData;

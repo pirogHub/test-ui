@@ -1,5 +1,5 @@
 :root {
-	--background: #ffffff;
+	--background: rgba(249, 250, 252, 1);
 	--foreground: #171717;
 }
 
@@ -163,6 +163,11 @@ body {
 	--sb-track-color: #ffffff;
 	--sb-thumb-color: #00000033;
 	--sb-size: 6px;
+	--test-red: #ff0000;
+}
+
+body.dark {
+	--test-red: #00ff00;
 }
 
 *::-webkit-scrollbar {
@@ -195,4 +200,21 @@ body {
 body.dark {
 	background: #252525;
 	color: white;
+}
+
+body {
+	--main-color: #000000;
+	--main-bg-color: #ffffff;
+	--main-icon-color: #000000;
+	--hover-bg-color: #f3f3f3;
+	--active-bg-color: #e1e1e1;
+	--disabled-bg-color: #e1e1e1;
+}
+body.dark {
+	--main-color: #ffffff;
+	--main-bg-color: #000000;
+	--main-icon-color: #ffffff;
+	--hover-bg-color: #3f3f3f;
+	--active-bg-color: #1e1e1e;
+	--disabled-bg-color: #1e1e1e;
 }

@@ -1,0 +1,73 @@
+.SkyAllianceButtonCss {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: none;
+	transition: all 0.4s ease;
+	gap: 8px;
+	cursor: pointer;
+	border: none;
+
+	color: var(--main-color);
+	background-color: var(--main-bg-color);
+
+	& .SkyIcon {
+		background-color: var(--main-icon-color);
+	}
+
+	&:hover,
+	&.hover {
+		background-color: var(--hover-bg-color);
+	}
+	&:active,
+	&.active {
+		background-color: var(--active-bg-color);
+	}
+	&:disabled,
+	&.disabled {
+		cursor: default;
+		background-color: var(--disabled-bg-color);
+		color: var(--disabled-color);
+		opacity: 0.4;
+		& .skyicon {
+			background-color: var(--disabled-icon-color);
+		}
+	}
+	// }
+	// 	&:hover, &.hover: {
+	// 		...map.hover;
+	// 		backgroundColor: map.hover.backgroundColor;
+	// 	};
+	// 	&:active, &.active: {
+	// 		...map.active;
+	// 		backgroundColor: map.active.backgroundColor;
+	// 	};
+	// 	&:disabled, &.disabled: {
+	// 		cursor: default;
+	// 		backgroundColor: map.disabled.backgroundColor;
+	// 		color: map.disabled.color;
+	// 		opacity: 0.4;
+	// 		& .SkyIcon: {
+	// 			backgroundColor: map.disabled.iconColor;
+	// 		};
+	// };
+}
+
+.size-xl {
+	height: 56px;
+	border-radius: 12px;
+	padding: 0 36px;
+	line-height: 20px;
+	font-weight: 600;
+	font-size: 16px;
+}
+
+.size-m {
+	height: 40px;
+	border-radius: 10px;
+	padding: 0 24px;
+	line-height: 20px;
+	font-weight: 600;
+	font-size: 14px;
+	gap: 8px;
+}

@@ -15,6 +15,9 @@ export const Header = () => {
 					<Link href={'/dashboard/page-buttons'}>page-buttons</Link>
 				</li>
 				<li>
+					<Link href={'/dashboard/page-buttons-css'}>page-buttons-css</Link>
+				</li>
+				<li>
 					<Link href={'/dashboard/page-inputs'}>page-inputs</Link>
 				</li>
 				<li>

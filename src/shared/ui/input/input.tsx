@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {forwardRef, useEffect, useRef, useState} from 'react';
 
 import {Fade, styled} from '@mui/material';
 
@@ -25,13 +25,13 @@ const Root = styled('div')`
 	outline: none;
 	width: 100%;
 
-	&:has(input:focus),
-	&:has(label.onManualTop) {
+	&:has(input:focus)
+	/* ,	&:has(label.onManualTop) */ {
 		outline: 2px solid #2eacfb;
 	}
 	&.error,
-	&.error:has(input:focus),
-	&.error:has(label.onManualTop) {
+	&.error:has(input:focus)
+	/* ,	&.error:has(label.onManualTop)  */ {
 		outline: 2px solid #eb5526;
 	}
 `;
@@ -62,6 +62,8 @@ const ErrorWrapper = styled('div', {
 }>`
 	opacity: ${(p) => (p.isVisible ? 1 : 0)};
 	color: #eb5526;
+	font-size: 13px;
+	line-height: 16px;
 `;
 
 // const Label = styled('label')`
@@ -113,6 +115,7 @@ const StyledInputWrapper = styled('div')`
 			outline: none;
 		}
 		line-height: 16px;
+		border-radius: 6px;
 	}
 	& > label {
 		position: absolute;
@@ -171,81 +174,268 @@ const StyledInputWrapper = styled('div')`
 	}
 `;
 
-export const InputField: React.FC<
-	React.InputHTMLAttributes<HTMLInputElement> & {
-		label?: string;
-		leftIcon?: React.ReactNode;
-		inputPrefix?: React.ReactNode;
-		rightIcon?: React.ReactNode;
-		rightIconSize?: number;
-		rightLabel?: string;
-		error?: string;
-		errorDescription?: React.ReactNode;
-		className?: string;
-		inputAs?: React.ElementType;
-		autoFocus?: boolean;
-		disableTopLine?: boolean;
-		setInputRef?: (ref: HTMLInputElement) => void;
-		_isFocusedManual?: boolean;
-	}
-> = ({label, placeholder, error, inputAs, _isFocusedManual}) => {
-	const [value, setValue] = useState('');
-	const [isFocused, setIsFocused] = useState(_isFocusedManual);
-
-	const clearInput = () => {
-		setValue('');
-	};
-
-	const inputRef = useRef<HTMLInputElement>(null);
-	return (
-		<RowsWrapper>
-			<Root className={error ? 'error' : ''}>
-				<div
-					onClick={() => inputRef.current?.focus()}
-					style={{display: 'flex', alignItems: 'center', width: '100%', paddingBlock: '15px'}}
-				>
-					<div style={{display: 'flex', alignItems: 'center'}}>
-						<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('search')} />
-					</div>
-					<StyledInputWrapper className="input-field">
-						<FormFieldInput
-							ref={inputRef}
-							as={inputAs}
-							value={value}
-							onFocus={() => setIsFocused(true)}
-							onBlur={() => setIsFocused(false)}
-							onChange={(e) => setValue(e.target.value)}
-						/>
-						<label className={_isFocusedManual ? 'onManualTop' : ''}>{label}</label>
-						<Fade in={_isFocusedManual || (isFocused && !value)} unmountOnExit>
-							<span className="placeholder">
-								<span>{placeholder}</span>
-							</span>
-						</Fade>
-					</StyledInputWrapper>
-				</div>
-				<div style={{display: 'flex', paddingBlock: '15px'}}>
-					<div style={{display: 'flex', alignItems: 'center', opacity: value.length ? 1 : 0}}>
-						<Icon2
-							onClick={clearInput}
-							sx={{cursor: value.length ? 'pointer' : 'default'}}
-							size={24}
-							color="#A4A5B1"
-							url={getIconUrlByName('chest')}
-						/>
-					</div>
-
-					<div style={{display: 'flex', alignItems: 'center'}}>
-						<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('helpCircle')} />
-					</div>
-					<div style={{display: 'flex', alignItems: 'center'}}>
-						<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('chevronDown')} />
-					</div>
-				</div>
-			</Root>
-			{<ErrorWrapper isVisible={Boolean(error)}>{error || 'empty'}</ErrorWrapper>}
-		</RowsWrapper>
-	);
+export const detectAutofill = (element: HTMLInputElement) => {
+	return new Promise((resolve) => {
+		// let timerId: NodeJS.Timeout | null = null;
+		const timerId = setTimeout(() => {
+			clearTimeout(timerId);
+			resolve(window.getComputedStyle(element, null).getPropertyValue('appearance') === 'menulist-button');
+		}, 600);
+	});
 };
 
+type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
+	label?: string;
+	leftIcon?: React.ReactNode;
+	inputPrefix?: React.ReactNode;
+	rightIcon?: React.ReactNode;
+	rightIconSize?: number;
+	rightLabel?: string;
+	error?: string;
+	errorDescription?: React.ReactNode;
+	className?: string;
+	inputAs?: React.ElementType;
+	autoFocus?: boolean;
+	disableTopLine?: boolean;
+	_isFocusedManual?: boolean;
+	isWithClearButton?: boolean;
+	leftComponentsArray?: {component: React.ReactNode; key: string}[];
+	helpMessage?: string;
+	onAutoFill?: (name: string) => void;
+};
+
+// export const InputField: React.FC<
+// 	React.InputHTMLAttributes<HTMLInputElement> & {
+// 		label?: string;
+// 		leftIcon?: React.ReactNode;
+// 		inputPrefix?: React.ReactNode;
+// 		rightIcon?: React.ReactNode;
+// 		rightIconSize?: number;
+// 		rightLabel?: string;
+// 		error?: string;
+// 		errorDescription?: React.ReactNode;
+// 		className?: string;
+// 		inputAs?: React.ElementType;
+// 		autoFocus?: boolean;
+// 		disableTopLine?: boolean;
+// 		setInputRef?: (ref: HTMLInputElement) => void;
+// 		_isFocusedManual?: boolean;
+// 		//
+// 		isWithClearButton?: boolean;
+// 		leftComponentsArray?: {component: React.ReactNode; key: string}[];
+// 		helpMessage?: string;
+// 	}
+// > = ({
+// 	label,
+// 	placeholder,
+// 	error,
+// 	inputAs,
+// 	_isFocusedManual,
+// 	isWithClearButton,
+// 	leftComponentsArray,
+// 	helpMessage,
+// 	...props
+// }) => {
+// 	const [value, setValue] = useState(props.value || '');
+// 	const [isFocused, setIsFocused] = useState(_isFocusedManual);
+
+// 	const clearInput = () => {
+// 		setValue('');
+// 	};
+
+// 	useEffect(() => {
+// 		console.log('props.value', props);
+
+// 		if (props.value) {
+// 			setValue(props.value);
+// 		}
+// 	}, [props.value]);
+
+// 	const inputRef = useRef<HTMLInputElement>(null);
+// 	return (
+// 		<RowsWrapper>
+// 			<Root className={error ? 'error' : ''}>
+// 				<div
+// 					onClick={() => inputRef.current?.focus()}
+// 					style={{display: 'flex', alignItems: 'center', width: '100%', paddingBlock: '15px'}}
+// 				>
+// 					<div style={{display: 'flex', alignItems: 'center'}}>
+// 						<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('search')} />
+// 					</div>
+// 					<StyledInputWrapper className="input-field">
+// 						<FormFieldInput
+// 							{...props}
+// 							// ref={inputRef}
+// 							// as={inputAs}
+// 							// value={value}
+// 							// onFocus={() => setIsFocused(true)}
+// 							// onBlur={() => setIsFocused(false)}
+// 							// onChange={(e) => setValue(e.target.value)}
+// 						/>
+// 						<label className={_isFocusedManual || value ? 'onManualTop' : ''}>{label}</label>
+// 						<Fade in={_isFocusedManual || (isFocused && !value)} unmountOnExit>
+// 							<span className="placeholder">
+// 								<span>{placeholder}</span>
+// 							</span>
+// 						</Fade>
+// 					</StyledInputWrapper>
+// 				</div>
+// 				<div style={{display: 'flex', paddingBlock: '15px'}}>
+// 					{isWithClearButton && (
+// 						<div style={{display: 'flex', alignItems: 'center', opacity: value ? 1 : 0}}>
+// 							<Icon2
+// 								onClick={clearInput}
+// 								sx={{cursor: value ? 'pointer' : 'default'}}
+// 								size={24}
+// 								color="#A4A5B1"
+// 								url={getIconUrlByName('chest')}
+// 							/>
+// 						</div>
+// 					)}
+
+// 					{helpMessage && ( // TODO popup
+// 						<div style={{display: 'flex', alignItems: 'center'}}>
+// 							<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('helpCircle')} />
+// 						</div>
+// 					)}
+// 					{/* <div style={{display: 'flex', alignItems: 'center'}}>
+// 						<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('chevronDown')} />
+// 					</div> */}
+// 					{leftComponentsArray &&
+// 						leftComponentsArray.map(({component, key}) => (
+// 							<div key={key} style={{display: 'flex', alignItems: 'center'}}>
+// 								{component}
+// 							</div>
+// 						))}
+// 				</div>
+// 			</Root>
+// 			{<ErrorWrapper isVisible={Boolean(error)}>{error || 'empty'}</ErrorWrapper>}
+// 		</RowsWrapper>
+// 	);
+// };
+
+export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
+	(
+		{
+			label,
+			placeholder,
+			error,
+			inputAs,
+			_isFocusedManual,
+			isWithClearButton,
+			leftComponentsArray,
+			helpMessage,
+			onAutoFill,
+			...props
+		},
+		ref,
+	) => {
+		const [value, setValue] = useState(props.value || '');
+		const [isFocused, setIsFocused] = useState(_isFocusedManual);
+		const [isAutofilled, setIsAutofilled] = useState(false);
+
+		const clearInput = () => {
+			setValue('');
+			props.onChange?.({target: {value: ''}} as React.ChangeEvent<HTMLInputElement>);
+		};
+
+		const inputRef = useRef<HTMLInputElement | null>(null);
+
+		useEffect(() => {
+			if (ref) {
+				if (typeof ref === 'function') {
+					ref(inputRef.current);
+				} else {
+					inputRef.current = ref.current;
+				}
+			}
+		}, [ref]);
+		useEffect(() => {
+			if (inputRef.current) {
+				detectAutofill(inputRef.current)
+					.then((isAutofilled) => {
+						if (isAutofilled) {
+							setIsAutofilled(true);
+							if (props.name) onAutoFill?.(props.name);
+						}
+					})
+					.catch(() => {});
+			}
+		}, [inputRef, onAutoFill]);
+		return (
+			<RowsWrapper>
+				<Root className={error ? 'error' : ''}>
+					<div
+						onClick={() => inputRef?.current?.focus()}
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							width: '100%',
+							paddingBlock: '15px',
+						}}
+					>
+						<div style={{display: 'flex', alignItems: 'center'}}>
+							<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('search')} />
+						</div>
+						<StyledInputWrapper className="input-field">
+							<FormFieldInput
+								as={inputAs}
+								value={value}
+								{...props}
+								// ref={ref}
+								ref={inputRef}
+								onFocus={(e) => {
+									props?.onFocus?.(e);
+									setIsFocused(true);
+								}}
+								onBlur={(e) => {
+									props?.onBlur?.(e);
+									setIsFocused(false);
+								}}
+								onChange={(e) => {
+									setValue(e.target.value);
+									props.onChange?.(e);
+									setIsAutofilled(false);
+								}}
+							/>
+							<label className={_isFocusedManual || isAutofilled || value ? 'onManualTop' : ''}>
+								{label}
+							</label>
+							<Fade in={_isFocusedManual || (isFocused && !value)} unmountOnExit>
+								<span className="placeholder">
+									<span>{placeholder}</span>
+								</span>
+							</Fade>
+						</StyledInputWrapper>
+					</div>
+					<div style={{display: 'flex', paddingBlock: '15px'}}>
+						{isWithClearButton && (
+							<div style={{display: 'flex', alignItems: 'center', opacity: value ? 1 : 0}}>
+								<Icon2
+									onClick={clearInput}
+									sx={{cursor: value ? 'pointer' : 'default'}}
+									size={24}
+									color="#A4A5B1"
+									url={getIconUrlByName('chest')}
+								/>
+							</div>
+						)}
+						{helpMessage && (
+							<div style={{display: 'flex', alignItems: 'center'}}>
+								<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('helpCircle')} />
+							</div>
+						)}
+						{leftComponentsArray?.map(({component, key}) => (
+							<div key={key} style={{display: 'flex', alignItems: 'center'}}>
+								{component}
+							</div>
+						))}
+					</div>
+				</Root>
+				{<ErrorWrapper isVisible={Boolean(error)}>{error || 'empty'}</ErrorWrapper>}
+			</RowsWrapper>
+		);
+	},
+);
+InputField.displayName = 'InputField';
 export default InputField;

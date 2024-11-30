@@ -9,10 +9,10 @@ import {FlexRow} from '@/shared/ui/layout';
 import Button from './button';
 import {
 	//
-	ButtonSize,
-	ButtonStyled,
+	ButtonSize, // ButtonStyled,
 	ButtonView,
 } from './button-styled';
+import {ButtonStyledCss as ButtonStyled} from './button-styled-css';
 
 interface TableButtonProps {
 	view: ButtonView;
@@ -64,7 +64,7 @@ const FourButtonsRow = ({
 	);
 };
 
-const TableButtonMulti = ({view, size}: TableButtonProps) => {
+const TableButtonMultiCss = ({view, size}: TableButtonProps) => {
 	const iconSize = size === 'xl' ? 24 : 20;
 
 	return (
@@ -153,4 +153,4 @@ const TableButtonMulti = ({view, size}: TableButtonProps) => {
 	);
 };
 
-export default TableButtonMulti;
+export default TableButtonMultiCss;
