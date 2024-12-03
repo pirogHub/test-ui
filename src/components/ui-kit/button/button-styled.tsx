@@ -6,7 +6,7 @@ import {CSSObject, styled} from '@mui/material';
 
 export type ButtonView = 'primary' | 'secondary' | 'outline' | 'flatted';
 
-export type ButtonSize = 'm' | 'xl';
+export type ButtonSize = 's' | 'm' | 'xl';
 
 interface RootProps {
 	view: ButtonView;
@@ -24,6 +24,16 @@ const getButtonSize = (size: ButtonSize, isRounded?: boolean, isOnlyIcon?: boole
 		fontSize: '16px',
 	};
 	switch (size) {
+		case 's':
+			return {
+				height: '32px',
+				borderRadius: isRounded ? '50%' : '8px',
+				padding: isOnlyIcon || isRounded ? '0 10px' : '0 24px',
+				lineHeight: '20px',
+				fontWeight: '600',
+				fontSize: '13px',
+				gap: '8px',
+			};
 		case 'm':
 			return {
 				height: '40px',

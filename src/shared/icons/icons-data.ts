@@ -9,11 +9,15 @@ const iconsUrlData = {
 	eyeOff: '/img/icons/eye-off.svg',
 	eyeOn: '/img/icons/eye-on.svg',
 
-	// SkyLogo: '/img/brand/Logo.svg',
 	SkyLogo: '/img/brand/Logo.png',
 	sortArrows: '/img/icons/sort-arrows.svg',
 	sortArrowsDown: '/img/icons/sort-arrows-down.svg',
 	sortArrowsUp: '/img/icons/sort-arrows-up.svg',
+	calendar: '/img/icons/calendar.svg',
+	user02: '/img/icons/user-02.svg',
+	sliders: '/img/icons/sliders-04.svg',
+	quill: '/img/icons/quill-label.svg',
+	plus: '/img/icons/plus.svg',
 };
 
 export type MyIconName = keyof typeof iconsUrlData;

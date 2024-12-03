@@ -1,25 +1,30 @@
 import {forwardRef, useEffect, useRef, useState} from 'react';
 
 import {skyAllianceMUITheme} from '@/styles/theme';
-import {Fade, styled} from '@mui/material';
+import {Fade, SxProps, styled} from '@mui/material';
 
 import {useDebounce} from '@/shared/hooks/use-debounce';
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 
 import {Icon2} from '../icon/icon';
 
-const RowsWrapper = styled('div')`
+const RowsWrapper = styled('div', {
+	label: 'rows-wrapper',
+})<{}>`
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 `;
 
-const Root = styled('div')`
+const Root = styled('div', {
+	shouldForwardProp: (prop) => prop !== 'size',
+	label: 'root',
+})<{size?: string}>`
 	border: 1px solid ${({theme}) => (theme as skyAllianceMUITheme).colors.base4};
 	border-radius: 12px;
 	display: inline-flex;
 
-	height: 56px;
+	height: ${(p) => (p.size === 'medium' ? '44px' : '56px')};
 	box-sizing: border-box;
 	padding-inline: 12px;
 	justify-content: space-between;
@@ -162,6 +167,10 @@ type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	onAutoFill?: (name: string) => void;
 	onChangeValue?: (newValue: string) => void;
 	debounceMs?: number;
+	size?: 'medium' | 'large' | undefined;
+	isWithoutErrors?: boolean;
+	sxRootContainer?: SxProps;
+	sxWrapper?: SxProps;
 };
 
 export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
@@ -178,6 +187,10 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 			onAutoFill,
 			onChangeValue,
 			debounceMs,
+			size = 'large',
+			isWithoutErrors,
+			sxRootContainer,
+			sxWrapper,
 			...props
 		},
 		ref,
@@ -189,6 +202,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 		const clearInput = () => {
 			setValue('');
 			props.onChange?.({target: {value: ''}} as React.ChangeEvent<HTMLInputElement>);
+			onChangeValue?.('');
 		};
 
 		const inputRef = useRef<HTMLInputElement | null>(null);
@@ -221,8 +235,8 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 			}
 		}, [inputRef, onAutoFill]);
 		return (
-			<RowsWrapper>
-				<Root className={error ? 'error' : ''}>
+			<RowsWrapper sx={sxWrapper}>
+				<Root sx={sxRootContainer} size={size} className={error ? 'error' : ''}>
 					<div
 						onClick={() => inputRef?.current?.focus()}
 						style={{
@@ -291,7 +305,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 						))}
 					</div>
 				</Root>
-				{<ErrorWrapper isVisible={Boolean(error)}>{error || 'empty'}</ErrorWrapper>}
+				{!isWithoutErrors && <ErrorWrapper isVisible={Boolean(error)}>{error || 'empty'}</ErrorWrapper>}
 			</RowsWrapper>
 		);
 	},
