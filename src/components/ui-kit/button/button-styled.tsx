@@ -1,6 +1,7 @@
 import React, {useMemo} from 'react';
 
 import {skyAllianceMUITheme} from '@/styles/theme';
+import {SkyAllianceBaseColorsNamesType} from '@/styles/theme/colors';
 import {CSSObject, styled} from '@mui/material';
 
 export type ButtonView = 'primary' | 'secondary' | 'outline' | 'flatted';
@@ -43,17 +44,26 @@ const getButtonSize = (size: ButtonSize, isRounded?: boolean, isOnlyIcon?: boole
 
 const Root = styled('button', {
 	shouldForwardProp: (propName) =>
-		propName !== 'view' && propName !== 'active' && propName !== 'hover' && propName !== 'sx',
+		propName !== 'view' &&
+		propName !== 'color' &&
+		propName !== 'active' &&
+		propName !== 'hover' &&
+		propName !== 'sx' &&
+		propName !== 'size' &&
+		propName !== 'isRounded' &&
+		propName !== 'isOnlyIcon' &&
+		propName !== 'overrideColorName',
 })<{
 	isOnlyIcon?: boolean;
 	view: ButtonView;
+	overrideColorName?: SkyAllianceBaseColorsNamesType;
 	size: ButtonSize;
 	active?: boolean;
 	hover?: boolean;
 	isRounded?: boolean;
-}>(({theme, view, isRounded, size, isOnlyIcon}) => {
+}>(({theme, view, isRounded, size, isOnlyIcon, overrideColorName}) => {
 	const map = (theme as skyAllianceMUITheme).skyAlliance.colors[view];
-
+	const overrideColor = overrideColorName ? (theme as skyAllianceMUITheme).colors[overrideColorName] : undefined;
 	const sizeStyles = getButtonSize(size, isRounded, isOnlyIcon);
 
 	return {
@@ -92,6 +102,8 @@ const Root = styled('button', {
 				backgroundColor: map.disabled.iconColor,
 			},
 		},
+
+		...(overrideColor ? {color: overrideColorName} : {}),
 	};
 });
 
@@ -101,6 +113,7 @@ export interface ButtonProps extends Omit<React.ComponentProps<typeof Root>, Exc
 	leftIcon?: React.ReactNode;
 	rightIcon?: React.ReactNode;
 	onClick?: React.MouseEventHandler<HTMLButtonElement>;
+	color?: SkyAllianceBaseColorsNamesType;
 
 	active?: boolean;
 	hover?: boolean;
@@ -123,6 +136,7 @@ export const ButtonStyled = React.forwardRef<HTMLButtonElement, React.PropsWithC
 			onClick,
 			sx,
 
+			color,
 			children,
 			className,
 
@@ -148,6 +162,7 @@ export const ButtonStyled = React.forwardRef<HTMLButtonElement, React.PropsWithC
 				onClick={onClick}
 				sx={sx}
 				{...props}
+				overrideColorName={color}
 			>
 				{leftComponent ? leftComponent : null}
 				{isChildrenExist ? (

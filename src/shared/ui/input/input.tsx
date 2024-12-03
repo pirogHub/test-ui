@@ -1,7 +1,9 @@
 import {forwardRef, useEffect, useRef, useState} from 'react';
 
+import {skyAllianceMUITheme} from '@/styles/theme';
 import {Fade, styled} from '@mui/material';
 
+import {useDebounce} from '@/shared/hooks/use-debounce';
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 
 import {Icon2} from '../icon/icon';
@@ -13,7 +15,7 @@ const RowsWrapper = styled('div')`
 `;
 
 const Root = styled('div')`
-	border: 1px solid #eaeaea;
+	border: 1px solid ${({theme}) => (theme as skyAllianceMUITheme).colors.base4};
 	border-radius: 12px;
 	display: inline-flex;
 
@@ -21,18 +23,15 @@ const Root = styled('div')`
 	box-sizing: border-box;
 	padding-inline: 12px;
 	justify-content: space-between;
-	/* gap: 1px; */
 	outline: none;
 	width: 100%;
 
-	&:has(input:focus)
-	/* ,	&:has(label.onManualTop) */ {
-		outline: 2px solid #2eacfb;
+	&:has(input:focus) {
+		outline: 2px solid ${({theme}) => (theme as skyAllianceMUITheme).colors.primary1};
 	}
 	&.error,
-	&.error:has(input:focus)
-	/* ,	&.error:has(label.onManualTop)  */ {
-		outline: 2px solid #eb5526;
+	&.error:has(input:focus) {
+		outline: 2px solid ${({theme}) => (theme as skyAllianceMUITheme).colors.error};
 	}
 `;
 
@@ -61,42 +60,10 @@ const ErrorWrapper = styled('div', {
 	isVisible: boolean;
 }>`
 	opacity: ${(p) => (p.isVisible ? 1 : 0)};
-	color: #eb5526;
+	color: ${({theme}) => (theme as skyAllianceMUITheme).colors.error};
 	font-size: 13px;
 	line-height: 16px;
 `;
-
-// const Label = styled('label')`
-// 	position: absolute;
-// 	left: 5px;
-// 	top: 50%;
-// 	transform: translateY(-50%);
-// 	width: 50px;
-// 	text-align: center;
-// 	pointer-events: none;
-// 	transition: 0.3s ease all;
-// 	font-size: 15px;
-
-// 	&.focus {
-// 		position: absolute;
-// 		left: 0;
-// 		transform: translateY(-150%) translateX(-10%);
-// 		width: 50px;
-// 		text-align: center;
-// 		transition: 0.2s ease all;
-// 		font-size: 13px;
-// 	}
-
-// 	&.fill {
-// 		position: absolute;
-// 		left: 0px;
-// 		transform: translateY(-150%);
-// 		width: 50px;
-// 		background: white;
-// 		text-align: center;
-// 		font-size: 13px;
-// 	}
-// `;
 
 const StyledInputWrapper = styled('div')`
 	position: relative;
@@ -127,7 +94,7 @@ const StyledInputWrapper = styled('div')`
 		pointer-events: none;
 		transition: 0.3s ease all;
 		font-size: 15px;
-		color: #1b1f3ba6;
+		color: ${({theme}) => (theme as skyAllianceMUITheme).colors.text3};
 	}
 
 	& > input:focus + label {
@@ -148,15 +115,7 @@ const StyledInputWrapper = styled('div')`
 		transition: 0.2s ease all;
 		font-size: 13px;
 	}
-	/* & > label.fill {
-		position: absolute;
-		left: 0px;
-		transform: translateY(-150%);
-		width: 50px;
-		background: white;
-		text-align: center;
-		font-size: 13px;
-	} */
+
 	& > .placeholder {
 		position: absolute;
 		height: 30px;
@@ -170,13 +129,12 @@ const StyledInputWrapper = styled('div')`
 		align-items: center;
 		line-height: 16px;
 		font-size: 13px;
-		color: #1b1f3b66;
+		color: ${({theme}) => (theme as skyAllianceMUITheme).colors.text4};
 	}
 `;
 
 export const detectAutofill = (element: HTMLInputElement) => {
 	return new Promise((resolve) => {
-		// let timerId: NodeJS.Timeout | null = null;
 		const timerId = setTimeout(() => {
 			clearTimeout(timerId);
 			resolve(window.getComputedStyle(element, null).getPropertyValue('appearance') === 'menulist-button');
@@ -202,117 +160,9 @@ type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	leftComponentsArray?: {component: React.ReactNode; key: string}[];
 	helpMessage?: string;
 	onAutoFill?: (name: string) => void;
+	onChangeValue?: (newValue: string) => void;
+	debounceMs?: number;
 };
-
-// export const InputField: React.FC<
-// 	React.InputHTMLAttributes<HTMLInputElement> & {
-// 		label?: string;
-// 		leftIcon?: React.ReactNode;
-// 		inputPrefix?: React.ReactNode;
-// 		rightIcon?: React.ReactNode;
-// 		rightIconSize?: number;
-// 		rightLabel?: string;
-// 		error?: string;
-// 		errorDescription?: React.ReactNode;
-// 		className?: string;
-// 		inputAs?: React.ElementType;
-// 		autoFocus?: boolean;
-// 		disableTopLine?: boolean;
-// 		setInputRef?: (ref: HTMLInputElement) => void;
-// 		_isFocusedManual?: boolean;
-// 		//
-// 		isWithClearButton?: boolean;
-// 		leftComponentsArray?: {component: React.ReactNode; key: string}[];
-// 		helpMessage?: string;
-// 	}
-// > = ({
-// 	label,
-// 	placeholder,
-// 	error,
-// 	inputAs,
-// 	_isFocusedManual,
-// 	isWithClearButton,
-// 	leftComponentsArray,
-// 	helpMessage,
-// 	...props
-// }) => {
-// 	const [value, setValue] = useState(props.value || '');
-// 	const [isFocused, setIsFocused] = useState(_isFocusedManual);
-
-// 	const clearInput = () => {
-// 		setValue('');
-// 	};
-
-// 	useEffect(() => {
-// 		console.log('props.value', props);
-
-// 		if (props.value) {
-// 			setValue(props.value);
-// 		}
-// 	}, [props.value]);
-
-// 	const inputRef = useRef<HTMLInputElement>(null);
-// 	return (
-// 		<RowsWrapper>
-// 			<Root className={error ? 'error' : ''}>
-// 				<div
-// 					onClick={() => inputRef.current?.focus()}
-// 					style={{display: 'flex', alignItems: 'center', width: '100%', paddingBlock: '15px'}}
-// 				>
-// 					<div style={{display: 'flex', alignItems: 'center'}}>
-// 						<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('search')} />
-// 					</div>
-// 					<StyledInputWrapper className="input-field">
-// 						<FormFieldInput
-// 							{...props}
-// 							// ref={inputRef}
-// 							// as={inputAs}
-// 							// value={value}
-// 							// onFocus={() => setIsFocused(true)}
-// 							// onBlur={() => setIsFocused(false)}
-// 							// onChange={(e) => setValue(e.target.value)}
-// 						/>
-// 						<label className={_isFocusedManual || value ? 'onManualTop' : ''}>{label}</label>
-// 						<Fade in={_isFocusedManual || (isFocused && !value)} unmountOnExit>
-// 							<span className="placeholder">
-// 								<span>{placeholder}</span>
-// 							</span>
-// 						</Fade>
-// 					</StyledInputWrapper>
-// 				</div>
-// 				<div style={{display: 'flex', paddingBlock: '15px'}}>
-// 					{isWithClearButton && (
-// 						<div style={{display: 'flex', alignItems: 'center', opacity: value ? 1 : 0}}>
-// 							<Icon2
-// 								onClick={clearInput}
-// 								sx={{cursor: value ? 'pointer' : 'default'}}
-// 								size={24}
-// 								color="#A4A5B1"
-// 								url={getIconUrlByName('chest')}
-// 							/>
-// 						</div>
-// 					)}
-
-// 					{helpMessage && ( // TODO popup
-// 						<div style={{display: 'flex', alignItems: 'center'}}>
-// 							<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('helpCircle')} />
-// 						</div>
-// 					)}
-// 					{/* <div style={{display: 'flex', alignItems: 'center'}}>
-// 						<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('chevronDown')} />
-// 					</div> */}
-// 					{leftComponentsArray &&
-// 						leftComponentsArray.map(({component, key}) => (
-// 							<div key={key} style={{display: 'flex', alignItems: 'center'}}>
-// 								{component}
-// 							</div>
-// 						))}
-// 				</div>
-// 			</Root>
-// 			{<ErrorWrapper isVisible={Boolean(error)}>{error || 'empty'}</ErrorWrapper>}
-// 		</RowsWrapper>
-// 	);
-// };
 
 export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 	(
@@ -326,11 +176,13 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 			leftComponentsArray,
 			helpMessage,
 			onAutoFill,
+			onChangeValue,
+			debounceMs,
 			...props
 		},
 		ref,
 	) => {
-		const [value, setValue] = useState(props.value || '');
+		const [value, setValue] = useState(String(props.value || '') || '');
 		const [isFocused, setIsFocused] = useState(_isFocusedManual);
 		const [isAutofilled, setIsAutofilled] = useState(false);
 
@@ -340,6 +192,12 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 		};
 
 		const inputRef = useRef<HTMLInputElement | null>(null);
+
+		const {debouncedValue} = useDebounce(value, debounceMs || 0);
+
+		useEffect(() => {
+			onChangeValue?.(debouncedValue);
+		}, [onChangeValue, debouncedValue]);
 
 		useEffect(() => {
 			if (ref) {
@@ -375,7 +233,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 						}}
 					>
 						<div style={{display: 'flex', alignItems: 'center'}}>
-							<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('search')} />
+							<Icon2 size={24} color="icon2" url={getIconUrlByName('search')} />
 						</div>
 						<StyledInputWrapper className="input-field">
 							<FormFieldInput
@@ -390,6 +248,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 								}}
 								onBlur={(e) => {
 									props?.onBlur?.(e);
+
 									setIsFocused(false);
 								}}
 								onChange={(e) => {
@@ -415,14 +274,14 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 									onClick={clearInput}
 									sx={{cursor: value ? 'pointer' : 'default'}}
 									size={24}
-									color="#A4A5B1"
+									color="icon2"
 									url={getIconUrlByName('chest')}
 								/>
 							</div>
 						)}
 						{helpMessage && (
 							<div style={{display: 'flex', alignItems: 'center'}}>
-								<Icon2 size={24} color="#A4A5B1" url={getIconUrlByName('helpCircle')} />
+								<Icon2 size={24} color="icon2" url={getIconUrlByName('helpCircle')} />
 							</div>
 						)}
 						{leftComponentsArray?.map(({component, key}) => (

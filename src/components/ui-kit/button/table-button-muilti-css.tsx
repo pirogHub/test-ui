@@ -5,16 +5,11 @@ import {styled} from '@mui/material';
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 import {Icon2} from '@/shared/ui/icon/icon';
 
-import {
-	//
-	ButtonSize, // ButtonStyled,
-	ButtonView,
-} from './button-styled';
+import {ButtonSize, ButtonView} from './button-styled';
 import {ButtonStyledCss as ButtonStyled} from './button-styled-css';
 
 interface TableButtonProps {
 	view: ButtonView;
-	// size: 'mylarge' | 'mysmall';
 	size: ButtonSize;
 }
 
@@ -26,14 +21,6 @@ const Cell = styled('div')`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-`;
-
-const RowLabel = styled('div')`
-	font-weight: bold;
-	text-align: left;
-	padding: 10px;
-	background-color: #f7f7f7;
-	border: 1px solid #ddd;
 `;
 
 const FourButtonsRow = ({

@@ -2,6 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
+import {skyAllianceMUITheme} from '@/styles/theme';
+import {getThemedColor} from '@/styles/theme/colors';
 import Header from '@/widgets/header/header';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {styled} from '@mui/material';
@@ -19,9 +21,21 @@ const FormWrapper = styled('div')`
 	min-width: 456px;
 	margin: auto;
 	padding: 40px 32px;
-	/* border: 1px solid #ccc; */
 	border-radius: 16px;
-	background-color: white;
+	background-color: ${({theme}) => (theme as skyAllianceMUITheme)?.colors?.base1};
+`;
+
+const Label = styled('div')`
+	gap: '10px';
+	text-align: 'center';
+	line-height: '18px';
+	font-size: '15px';
+	font-weight: 500;
+	color: ${({theme}) => (theme as skyAllianceMUITheme)?.colors?.base4};
+
+	& .email-label {
+		color: ${({theme}) => (theme as skyAllianceMUITheme)?.colors?.primary1};
+	}
 `;
 
 const Title = styled('h2')`
@@ -29,27 +43,6 @@ const Title = styled('h2')`
 	justify-content: center;
 	text-align: center;
 `;
-
-// export const FormFieldInput = styled('input', {
-// 	shouldForwardProp: (prop) =>
-// 		prop !== 'error' && prop !== 'withLeftIcon' && prop !== 'inputPrefix' && prop !== 'as' && prop !== 'sx',
-// })<{error?: string; withLeftIcon?: boolean}>`
-// 	outline: none;
-// 	width: 100%;
-// 	padding: 8px 10px;
-// 	${(p) => (p.withLeftIcon ? 'padding-left: 24px' : '')};
-// 	box-sizing: border-box;
-// 	font-size: 14px;
-// 	line-height: 16px;
-
-// 	border-radius: 6px;
-// 	border-width: 1px;
-// 	border-style: solid;
-
-// 	&:disabled {
-// 		cursor: not-allowed;
-// 	}
-// `;
 
 const LoginPage = () => {
 	const {
@@ -138,7 +131,7 @@ const LoginPage = () => {
 									{
 										component: (
 											<Icon2
-												color="rgba(164, 165, 177, 1)"
+												color="icon1"
 												sx={{cursor: 'pointer'}}
 												onClick={() => setIsShowPassword((prev) => !prev)}
 												size={24}
@@ -154,25 +147,13 @@ const LoginPage = () => {
 							Войти
 						</ButtonStyled>
 					</div>
-					<div
-						style={{
-							// display: 'flex',
-							gap: '10px',
-							// justifyContent: 'center',
-							// alignItems: 'center',
-							textAlign: 'center',
-							lineHeight: '18px',
-							fontSize: '15px',
-							fontWeight: 500,
-							color: 'rgba(27, 31, 59, 0.4)',
-						}}
-					>
+					<Label>
 						Не можете войти в систему?
 						<br /> Напишите нам{' '}
-						<a style={{display: 'inline'}} href="mailto:help@skyalliance.media">
+						<span className="email-label" style={{display: 'inline'}}>
 							help@skyalliance.media
-						</a>
-					</div>
+						</span>
+					</Label>
 				</FormWrapper>
 			</div>
 		</>

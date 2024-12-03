@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {skyAllianceMUITheme} from '@/styles/theme';
+import {SkyAllianceBaseColorsNamesType} from '@/styles/theme/colors';
 import styled from '@emotion/styled';
 
 import {getIconUrlByName} from '@/shared/icons/icons-data';
@@ -8,8 +10,8 @@ import {Icon2} from '../icon';
 
 type Props = {
 	leftIcon?: React.ReactNode | false;
-	color: string;
-	backgroundColor: string;
+	color: SkyAllianceBaseColorsNamesType;
+	backgroundColor: SkyAllianceBaseColorsNamesType;
 	label?: string;
 	rightComponent?: React.ReactNode;
 };
@@ -17,8 +19,8 @@ type Props = {
 const Root = styled('div', {
 	shouldForwardProp: (propName) => propName !== 'color' && propName !== 'backgroundColor',
 })<{
-	color: string;
-	backgroundColor: string;
+	color: SkyAllianceBaseColorsNamesType;
+	backgroundColor: SkyAllianceBaseColorsNamesType;
 }>`
 	border-radius: 6px;
 	padding: 2px 10px;
@@ -30,12 +32,16 @@ const Root = styled('div', {
 	line-height: 20px;
 	font-weight: 600;
 	font-size: 13px;
-	color: ${(p) => p.color};
-	background-color: ${(p) => p.backgroundColor};
+	/* color: ${(p) => p.color};
+	background-color: ${(p) => p.backgroundColor}; */
+	color: ${(p) => (p.theme as skyAllianceMUITheme).colors[p.color]};
+	background-color: ${(p) => (p.theme as skyAllianceMUITheme).colors[p.backgroundColor]};
 
 	& .SkyIcon {
-		color: ${(p) => p.color};
-		background-color: ${(p) => p.color};
+		/* color: ${(p) => p.color};
+		background-color: ${(p) => p.color}; */
+		color: ${(p) => (p.theme as skyAllianceMUITheme).colors[p.color]};
+		background-color: ${(p) => (p.theme as skyAllianceMUITheme).colors[p.color]};
 	}
 `;
 

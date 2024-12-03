@@ -1,50 +1,54 @@
 import React from 'react';
 
+import {SkyAllianceBaseColorsNamesType} from '@/styles/theme/colors';
+
 import {Badge} from '../badge';
 
-export type StatusTypes = 'analyze' | 'in-work' | 'done' | 'specified' | 'rejected' | 'waited' | 'draft';
+export const StatusTypesVals = ['analyze', 'in-work', 'done', 'specified', 'rejected', 'waited', 'draft'] as const;
+// export type StatusTypes = 'analyze' | 'in-work' | 'done' | 'specified' | 'rejected' | 'waited' | 'draft';
+export type StatusTypes = (typeof StatusTypesVals)[number];
 
 const StatusDataMap: Record<
 	StatusTypes,
 	{
-		color: string;
-		background: string;
+		color: SkyAllianceBaseColorsNamesType;
+		background: SkyAllianceBaseColorsNamesType;
 		label: string;
 	}
 > = {
 	analyze: {
-		color: '#2062F1',
-		background: '#EBF1FD',
+		color: 'StatusText1',
+		background: 'StatusBg1',
 		label: 'Анализ',
 	},
 	'in-work': {
-		color: '#7D22CE',
-		background: '#F3E8FF',
+		color: 'StatusText2',
+		background: 'StatusBg2',
 		label: 'В работе',
 	},
 	done: {
-		color: '#417A47',
-		background: '#DAF4CB',
+		color: 'StatusText3',
+		background: 'StatusBg3',
 		label: 'Выполнено',
 	},
 	specified: {
-		color: '#F2B200',
-		background: '#FFF9DE',
+		color: 'StatusText4',
+		background: 'StatusBg4',
 		label: 'Уточнение',
 	},
 	rejected: {
-		color: '#EB5526',
-		background: '#FFE8E4',
+		color: 'StatusText5',
+		background: 'StatusBg5',
 		label: 'Отменено',
 	},
 	waited: {
-		color: '#F39B0E',
-		background: '#FFEFD7',
+		color: 'StatusText6',
+		background: 'StatusBg6',
 		label: 'Ожидание',
 	},
 	draft: {
-		color: '#757575',
-		background: '#F5F5F5',
+		color: 'StatusText7',
+		background: 'StatusBg7',
 		label: 'Черновик',
 	},
 };

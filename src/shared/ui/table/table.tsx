@@ -1,42 +1,19 @@
 import * as React from 'react';
 
 import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import {skyAllianceMUITheme} from '@/styles/theme';
+import {getThemedColor} from '@/styles/theme/colors';
 import {MenuItem, PaginationItem, Select} from '@mui/material';
 import {styled} from '@mui/material';
 import Box from '@mui/material/Box';
 // import * as React from 'react';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import IconButton from '@mui/material/IconButton';
 import MuiPagination from '@mui/material/Pagination';
-import Paper from '@mui/material/Paper';
-// import Checkbox from '@mui/material/Checkbox';
-// import FormControlLabel from '@mui/material/FormControlLabel';
-import Rating from '@mui/material/Rating';
-import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import {TablePaginationProps} from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import TextField from '@mui/material/TextField';
-import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import {
 	DataGrid,
-	GridPagination,
+	DataGridProps,
 	GridRenderCellParams,
-	GridRowParams,
 	GridSlotsComponentsProps,
 	GridTreeNodeWithRender,
 	gridPageCountSelector,
@@ -47,14 +24,13 @@ import {
 	useGridApiRef,
 	useGridSelector,
 } from '@mui/x-data-grid';
-import {useGridPagination} from '@mui/x-data-grid/internals';
 import {useRouter} from 'next/router';
 
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 
 import {Icon2} from '../icon';
-// import {randomRating, randomTraderName} from '@mui/x-data-grid-generator';
 import {StatusBadge, StatusTypes} from '../status-badge/badge-status';
+import Filters from './filters/filters';
 
 interface Data {
 	id: number;
@@ -107,7 +83,7 @@ const labelDictionary: Record<keyof Data, string> = {
 const labelDictionaryReversed = Object.fromEntries(Object.entries(labelDictionary).map(([key, value]) => [value, key]));
 
 const CustomizeCellContent: (
-	params: GridRenderCellParams<Data, any, any, GridTreeNodeWithRender>,
+	params: GridRenderCellParams<Data, unknown, unknown, GridTreeNodeWithRender>,
 ) => React.ReactNode = (params) => {
 	// console.log('props', params);
 	// return null;
@@ -141,7 +117,6 @@ const CustomizeCellContent: (
 				if (params.row.status === 'rejected' || params.row.status === 'done') content = null;
 				else {
 					content = (
-						// <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
 						<ButtonStyled
 							onClick={(e) => {
 								e.stopPropagation();
@@ -149,7 +124,6 @@ const CustomizeCellContent: (
 							label="Отменить"
 							view="outline"
 						/>
-						// </div>
 					);
 				}
 				break;
@@ -161,14 +135,14 @@ const CustomizeCellContent: (
 	}
 };
 
-function descendingComparator<T>(a: T, b: T, cell1, cell2) {
+const descendingComparator: DataGridProps['columns'][0]['sortComparator'] = (a, b, cell1, cell2) => {
 	// console.log(a, b, cell1, cell2);
 	if (cell1.field === 'status' || typeof a === 'string') {
-		return a.localeCompare(b);
+		return -1 * (a as string).localeCompare(b as string);
 	}
 
-	return a - b > 0 ? 1 : -1;
-}
+	return a - b > 0 ? -1 : 1;
+};
 const TablePaginationSelect = styled(Select, {
 	name: 'MuiTablePagination',
 	slot: 'Select',
@@ -181,42 +155,31 @@ const TablePaginationSelect = styled(Select, {
 			content: '',
 		},
 	}),
-})({
-	// color: 'inherit',
-	// fontSize: 'inherit',
-	// flexShrink: 0,
-	'&::after, &::before': {
-		// content: "''",
-		display: 'none',
-	},
-	border: '1px solid rgba(234, 234, 234, 1)',
-	borderRadius: '8px',
-	// padding: '0 12px',
-	backgroundColor: '#fff',
-	boxSizing: 'border-box',
+})(({theme}) => {
+	const colors = (theme as skyAllianceMUITheme).colors;
+	return {
+		'&::after, &::before': {
+			display: 'none',
+		},
+		border: `1px solid ${colors.base4}`,
+		borderRadius: '8px',
+		backgroundColor: colors.base1,
+		boxSizing: 'border-box',
 
-	'& .MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiInput-input ': {
-		padding: '4px 22px 4px 12px',
-	},
+		'& .MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiInput-input ': {
+			padding: '4px 22px 4px 12px',
+		},
 
-	'& svg': {
-		right: '4px',
-	},
-
-	// marginRight: 32,
-	// marginLeft: 8,
-	// [`& .${tablePaginationClasses.select}`]: {
-	// 	paddingLeft: 8,
-	// 	paddingRight: 24,
-	// 	textAlign: 'right',
-	// 	textAlignLast: 'right', // Align <select> on Chrome.
-	// },
+		'& svg': {
+			right: '4px',
+		},
+	};
 });
 const Pagination = ({
 	page,
 	onPageChange,
 	pageCount,
-}: Pick<TablePaginationProps, 'page' | 'onPageChange'> & {pageCount: number}) => {
+}: Pick<TablePaginationProps, 'page'> & {pageCount: number; onPageChange: (page: number) => void}) => {
 	// const inProps = useGridC()
 
 	return (
@@ -231,22 +194,23 @@ const Pagination = ({
 				renderItem={(item) => {
 					return (
 						<PaginationItem
-							sx={{
-								border: 'none',
-								backgroundColor: '#fff',
-								color: 'black',
+							className="Styled-MuiPaginationItem"
+							// sx={{
+							// 	border: 'none',
+							// 	backgroundColor: getThemedColor('base4'),
+							// 	color: 'black',
 
-								'&.MuiPaginationItem-root.Mui-selected': {
-									color: 'rgba(46, 172, 251, 1)',
-									border: 'none',
-									backgroundColor: '#fff',
-								},
-							}}
+							// 	'&.MuiPaginationItem-root.Mui-selected': {
+							// 		color: getThemedColor('primary1'),
+							// 		border: 'none',
+							// 		backgroundColor: getThemedColor('base4'),
+							// 	},
+							// }}
 							{...item}
 						/>
 					);
 				}}
-				onChange={(event, newPage) => {
+				onChange={(e, newPage) => {
 					onPageChange(newPage - 1);
 				}}
 			/>
@@ -254,17 +218,17 @@ const Pagination = ({
 	);
 };
 
-const CustomPagination = (props: any) => {
-	return (
-		<TablePagination
-			// labelDisplayedRows={({from, to, count}) => `${from}-${to} из ${count}`}
-			labelRowsPerPage="Показывать по: "
-			labelDisplayedRows={() => ''}
-			ActionsComponent={Pagination}
-			{...props}
-		/>
-	);
-};
+// const CustomPagination = (props: any) => {
+// 	return (
+// 		<TablePagination
+// 			// labelDisplayedRows={({from, to, count}) => `${from}-${to} из ${count}`}
+// 			labelRowsPerPage="Показывать по: "
+// 			labelDisplayedRows={() => ''}
+// 			ActionsComponent={Pagination}
+// 			{...props}
+// 		/>
+// 	);
+// };
 const CustomFooterStatusComponent = (
 	props: NonNullable<GridSlotsComponentsProps['footer']> & {pageSizeOptions: number[]},
 ) => {
@@ -286,7 +250,7 @@ const CustomFooterStatusComponent = (
 
 	return (
 		<Box sx={{p: 1, display: 'flex', justifyContent: 'space-between'}}>
-			<Pagination page={page1} pageCount={pageCount} onPageChange={(page) => setPage(page)} />
+			<Pagination page={page1} pageCount={pageCount} onPageChange={setPage} />
 			<div style={{display: 'flex', alignItems: 'center', gap: 12}}>
 				<label>Показывать по</label>
 				<TablePaginationSelect
@@ -295,8 +259,7 @@ const CustomFooterStatusComponent = (
 					value={pageSize}
 					defaultValue={pageSize}
 					onChange={(e) => {
-						// console.log(e.target.value);
-						setPageSize(e.target.value);
+						setPageSize(Number(e.target.value));
 					}}
 				>
 					{pageSizeOptions.map((option) => (
@@ -310,8 +273,83 @@ const CustomFooterStatusComponent = (
 	);
 };
 const ColumnSortedDescendingIcon = ({...props}) => (
-	<Icon2 color="rgba(164, 165, 177, 1)" url={getIconUrlByName('sortArrows')} size={20} />
+	<Icon2 color="icon2" url={getIconUrlByName('sortArrows')} size={20} />
 );
+
+const StyledDataGrid = styled(DataGrid)(({theme}) => {
+	const colors = (theme as skyAllianceMUITheme).colors;
+	return {
+		border: 'none',
+		backgroundColor: 'transparent',
+
+		'& .MuiDataGrid-main': {
+			borderTopLeftRadius: '12px',
+			borderTopRightRadius: '12px',
+		},
+		'& .MuiDataGrid-columnHeader:focus': {
+			outline: 'none',
+		},
+		'& .MuiDataGrid-columnSeparator': {
+			display: 'none',
+		},
+		'& .MuiDataGrid-topContainer': {
+			backgroundColor: colors.base6,
+		},
+		'& .MuiDataGrid-columnHeader': {
+			backgroundColor: colors.base6,
+			color: colors.icon2,
+			fontWeight: 600,
+			fontSize: 15,
+
+			border: 'none!important',
+		},
+		'& .MuiDataGrid-row--borderBottom ': {
+			border: 'none',
+			borderBottom: `1px solid ${colors.base6}!important`,
+			// backgroundColor: `${colors.base1}!important`, //  todo '--DataGrid-container': 'rgba(236, 239, 244, 1)',
+		},
+		'& .MuiDataGrid-scrollbarFiller, & .MuiDataGrid-filler': {
+			display: 'none',
+		},
+		'& .MuiDataGrid-row, & .MuiDataGrid-row.MuiDataGrid-row--firstVisible': {
+			cursor: 'pointer',
+			'--rowBorderColor': `${colors.base4} !important`,
+			backgroundColor: colors.base1,
+			'--height': '50px',
+			'&:hover': {
+				backgroundColor: colors.base5,
+			},
+		},
+		'& .MuiDataGrid-cell': {
+			'&:focus, &:focus-within': {
+				outline: 'none',
+			},
+		},
+		'& .MuiDataGrid-footerContainer': {
+			border: 'none',
+		},
+
+		'& .Styled-MuiPaginationItem': {
+			border: 'none',
+			backgroundColor: colors.base1,
+			color: 'black',
+		},
+		'& .Styled-MuiPaginationItem.MuiPaginationItem-root.Mui-selected': {
+			color: colors.primary1,
+			border: 'none',
+			backgroundColor: colors.base1,
+		},
+
+		'& .MuiDataGrid-columnHeaderTitle': {
+			color: colors.icon2,
+			fontWeight: 600,
+			lineHeight: '18px',
+		},
+		'& .MuiDataGrid-columnHeaderTitleContainer': {
+			gap: 3,
+		},
+	};
+});
 
 const ColumnAutosizing = () => {
 	const apiRef = useGridApiRef();
@@ -334,7 +372,7 @@ const ColumnAutosizing = () => {
 		return keys
 			.filter((key) => key !== 'id')
 			.map((key) => {
-				return {
+				const item: DataGridProps['columns'][0] = {
 					resizable: key !== 'rejectButton',
 					sortable: key !== 'rejectButton',
 					flex: 1,
@@ -344,6 +382,7 @@ const ColumnAutosizing = () => {
 					field: key,
 					headerName: labelDictionary[key as keyof Data],
 				};
+				return item;
 			});
 	}, [isWithReject]);
 
@@ -352,72 +391,15 @@ const ColumnAutosizing = () => {
 	return (
 		<div style={{width: '100%'}}>
 			<div style={{width: '100%'}}>
-				<DataGrid
-					onRowClick={({...row}, e) => {
-						// console.log('row row', row, e);
-						console.log('row row', row, e);
+				<StyledDataGrid
+					onRowClick={({...data}, e) => {
+						const row = data.row as Data;
+						console.log('row row', data, e);
 
-						router.push(`/application/${row.row.appNumber}`);
+						router.push(`/application/${row.appNumber}`).catch(() => {});
 					}}
 					apiRef={apiRef}
 					density="standard"
-					sx={{
-						border: 'none',
-						// border: '1px solid red',
-						backgroundColor: 'transparent',
-						// '& .MuiDataGrid-menuIconButton': {
-						// 	display: 'none',
-						// },
-						'& .MuiDataGrid-main': {
-							borderTopLeftRadius: '12px',
-							borderTopRightRadius: '12px',
-						},
-						'& .MuiDataGrid-columnHeader:focus': {
-							outline: 'none',
-						},
-						'& .MuiDataGrid-columnSeparator': {
-							display: 'none',
-						},
-						'& .MuiDataGrid-topContainer': {
-							backgroundColor: 'rgba(236, 239, 244, 1)',
-						},
-						'& .MuiDataGrid-columnHeader': {
-							backgroundColor: 'rgba(236, 239, 244, 1)',
-							color: 'rgba(164, 165, 177, 1)',
-							fontWeight: 600,
-							fontSize: 15,
-							// lineHeight: 18,
-							// padding: '0 20px',
-							// minHeight: 50,
-							// boxSizing: 'content-box',
-							border: 'none!important',
-						},
-						'& .MuiDataGrid-row--borderBottom ': {
-							border: 'none',
-							borderBottom: '1px solid rgba(236, 239, 244, 1)!important',
-							backgroundColor: 'rgba(236, 239, 244, 1)!important', //  todo '--DataGrid-container': 'rgba(236, 239, 244, 1)',
-						},
-						'& .MuiDataGrid-scrollbarFiller, & .MuiDataGrid-filler': {
-							display: 'none',
-						},
-						'& .MuiDataGrid-row': {
-							cursor: 'pointer',
-							'--rowBorderColor': 'rgba(234, 234, 234, 1)',
-							backgroundColor: '#fff',
-							'--height': '50px',
-							'&:hover': {
-								backgroundColor: 'rgba(248, 248, 248, 1)',
-							},
-						},
-						'& .MuiDataGrid-cell': {
-							'&:focus, &:focus-within': {
-								outline: 'none',
-							},
-						},
-						'& .MuiDataGrid-footerContainer': {
-							border: 'none',
-						},
-					}}
 					sortingOrder={['desc', 'asc']}
 					disableColumnResize={true}
 					disableColumnFilter={true}
@@ -427,8 +409,15 @@ const ColumnAutosizing = () => {
 					disableEval={true}
 					disableRowSelectionOnClick={true}
 					slots={{
-						columnSortedDescendingIcon: ColumnSortedDescendingIcon,
-						columnSortedAscendingIcon: ColumnSortedDescendingIcon,
+						columnSortedDescendingIcon: () => (
+							<Icon2 isNotIcon size={16} url={getIconUrlByName('sortArrowsDown')} />
+						),
+						columnSortedAscendingIcon: () => (
+							<Icon2 isNotIcon size={16} url={getIconUrlByName('sortArrowsUp')} />
+						),
+						columnUnsortedIcon: () => (
+							<Icon2 isNotIcon sx={{opacity: 0.55}} size={16} url={getIconUrlByName('sortArrowsDown')} />
+						),
 						// pagination: CustomPagination,
 						// pagination: Pagination,
 						footer: () => <CustomFooterStatusComponent pageSizeOptions={[5, 10, 25]} />, //CustomFooterStatusComponent,
@@ -455,7 +444,11 @@ const ColumnAutosizing = () => {
 							style: {
 								display: 'flex',
 								alignItems: 'center',
-								// justifyContent: 'center',
+							},
+						},
+						row: {
+							style: {
+								'--height': '51px',
 							},
 						},
 					}}
@@ -474,6 +467,7 @@ const ColumnAutosizing = () => {
 const CTable = () => {
 	return (
 		<>
+			<Filters />
 			<ColumnAutosizing
 			// CellContentCustomize={(key, data) => CustomizeCellContent(key, data)}
 			// HeaderCellContentCustomize={(id, data) => CustomizeCellContent('id', data, true)}

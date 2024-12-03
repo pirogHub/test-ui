@@ -12,6 +12,8 @@ const iconsUrlData = {
 	// SkyLogo: '/img/brand/Logo.svg',
 	SkyLogo: '/img/brand/Logo.png',
 	sortArrows: '/img/icons/sort-arrows.svg',
+	sortArrowsDown: '/img/icons/sort-arrows-down.svg',
+	sortArrowsUp: '/img/icons/sort-arrows-up.svg',
 };
 
 export type MyIconName = keyof typeof iconsUrlData;
