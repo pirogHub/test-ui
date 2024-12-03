@@ -41,7 +41,7 @@ const Root = styled('div', {
 
 const Text = styled('span')``;
 
-export const Budge: React.FC<React.PropsWithChildren<Props>> = ({
+export const Badge: React.FC<React.PropsWithChildren<Props>> = ({
 	color,
 	rightComponent,
 	backgroundColor,

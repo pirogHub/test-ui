@@ -53,7 +53,6 @@ const Root = styled('button', {
 	isRounded?: boolean;
 }>(({theme, view, isRounded, size, isOnlyIcon}) => {
 	const map = (theme as skyAllianceMUITheme).skyAlliance.colors[view];
-	console.log('render 111');
 
 	const sizeStyles = getButtonSize(size, isRounded, isOnlyIcon);
 

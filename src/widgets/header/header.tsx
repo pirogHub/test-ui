@@ -19,7 +19,7 @@ const Header = () => {
 				}}
 			>
 				<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-					<img height="30" alt="Logo" src={getIconUrlByName('SkyLogo')} />
+					<Image width="90" height="30" alt="Logo" src={getIconUrlByName('SkyLogo')} />
 				</div>
 			</div>
 		</header>

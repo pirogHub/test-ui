@@ -191,7 +191,9 @@ body.dark {
 }
 
 body {
-	transition: all 0.3s ease;
+	transition:
+		all 0.3s ease,
+		padding 0s ease;
 	color: var(--foreground);
 	background: var(--background);
 	font-family: Gilroy, Helvetica, sans-serif;

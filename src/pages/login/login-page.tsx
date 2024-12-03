@@ -10,7 +10,7 @@ import {getIconUrlByName} from '@/shared/icons/icons-data';
 import {Icon2} from '@/shared/ui/icon';
 import {InputField} from '@/shared/ui/input';
 
-import {LoginFormValues, loginSchema} from './types';
+import {LoginFormValues, loginSchema} from '../../types/user.types';
 
 const FormWrapper = styled('div')`
 	display: flex;

@@ -4,7 +4,7 @@ import {CircularProgress, styled} from '@mui/material';
 
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 
-import {Budge} from '../badge';
+import {Badge} from '../badge';
 import {Icon2} from '../icon';
 
 const Container = styled('div')`
@@ -47,20 +47,6 @@ const FileList = styled('div')`
 
 const FileInput = styled('input')`
 	display: none;
-`;
-
-const Button = styled('button')`
-	margin-top: 10px;
-	padding: 8px 15px;
-	background-color: #007bff;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-
-	&:hover {
-		background-color: #0056b3;
-	}
 `;
 
 interface FileData {
@@ -174,7 +160,7 @@ export const DrugAndDrop: React.FC = () => {
 					console.log(file.progress);
 
 					return (
-						<Budge
+						<Badge
 							color="rgba(35, 31, 35, 1)"
 							backgroundColor="rgba(245, 245, 245, 1)"
 							key={index}

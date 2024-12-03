@@ -1,12 +1,10 @@
 import React from 'react';
 
-import {Grid2, styled} from '@mui/material';
+import {styled} from '@mui/material';
 
 import {getIconUrlByName} from '@/shared/icons/icons-data';
-import Icon, {Icon2} from '@/shared/ui/icon/icon';
-import {FlexRow} from '@/shared/ui/layout';
+import {Icon2} from '@/shared/ui/icon/icon';
 
-import Button from './button';
 import {
 	//
 	ButtonSize, // ButtonStyled,
@@ -19,9 +17,6 @@ interface TableButtonProps {
 	// size: 'mylarge' | 'mysmall';
 	size: ButtonSize;
 }
-
-const states = ['normal', 'hover', 'active', 'disabled'];
-const configurations = ['default', 'with left icon', 'with right icon', 'only icon'];
 
 const Cell = styled('div')`
 	text-align: center;

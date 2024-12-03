@@ -34,14 +34,14 @@ export const Button: React.FC<React.PropsWithChildren<ButtonProps>> = ({
 	children,
 	leftComponent,
 	rightComponent,
-	isRounded,
+	// isRounded,
 	...props
 }) => {
 	const isChildrenExist = label || children;
 	const sx = {
 		...props.sx,
 		...(!isChildrenExist ? getOnlyIconStyles(props.size) : {}),
-		...(isRounded ? {borderRadius: '50%'} : {}),
+		// ...(isRounded ? {borderRadius: '50%'} : {}),
 	};
 	return (
 		<MuiButton {...props} sx={sx} className={isActive ? 'active' : ''}>

@@ -29,6 +29,9 @@ export const Header = () => {
 				<li>
 					<Link href={'/dashboard/page-drug-and-drop'}>page-drug-and-drop</Link>
 				</li>
+				<li>
+					<Link href={'/dashboard/page-table'}>page-table</Link>
+				</li>
 				{/* <li><Link href={'/dashboard/page-buttons'}></Link></li> */}
 			</ul>
 

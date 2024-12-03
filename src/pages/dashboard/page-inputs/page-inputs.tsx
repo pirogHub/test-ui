@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {Header} from '@/components/header';
-import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
 
 import {InputField} from '@/shared/ui/input';
 

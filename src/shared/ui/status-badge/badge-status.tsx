@@ -1,8 +1,8 @@
 import React from 'react';
 
-import {Budge} from '../Budge';
+import {Badge} from '../badge';
 
-type StatusTypes = 'analyze' | 'in-work' | 'done' | 'specified' | 'rejected' | 'waited' | 'draft';
+export type StatusTypes = 'analyze' | 'in-work' | 'done' | 'specified' | 'rejected' | 'waited' | 'draft';
 
 const StatusDataMap: Record<
 	StatusTypes,
@@ -53,12 +53,12 @@ type Props = {
 	status: StatusTypes;
 };
 
-export const StatusBudge = (props: Props) => {
+export const StatusBadge = (props: Props) => {
 	const {status} = props;
 	const {background, color, label} = StatusDataMap[status];
 	return (
-		<Budge color={color} backgroundColor={background}>
+		<Badge color={color} backgroundColor={background}>
 			{label}
-		</Budge>
+		</Badge>
 	);
 };
