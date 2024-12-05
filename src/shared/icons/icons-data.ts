@@ -18,6 +18,7 @@ const iconsUrlData = {
 	sliders: '/img/icons/sliders-04.svg',
 	quill: '/img/icons/quill-label.svg',
 	plus: '/img/icons/plus.svg',
+	filterAdd: '/img/icons/filter-add.svg',
 };
 
 export type MyIconName = keyof typeof iconsUrlData;

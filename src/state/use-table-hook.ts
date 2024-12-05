@@ -110,12 +110,39 @@ export const useTableStore = () => {
 
 	return {
 		// ...handlers,
-		selectedExecutors: tableData.executors,
-		selectedStatuses: tableData.status,
-		selectedAppTypes: tableData.type,
-		setSelectedExecutors: handlers.setExecutors,
-		setSelectedStatuses: handlers.setStatus,
-		setSelectedAppTypes: handlers.setType,
+		// selectedExecutors: tableData.executors,
+		// selectedStatuses: tableData.status,
+		// selectedAppTypes: tableData.type,
+		// setSelectedExecutors: handlers.setExecutors,
+		// setSelectedStatuses: handlers.setStatus,
+		// setSelectedAppTypes: handlers.setType,
+		// handlers: {
+		// 	executor: {
+		// 		data: tableData.executors,
+		// 		setter: handlers.setExecutors,
+		// 	},
+		// 	status: {
+		// 		data: tableData.status,
+		// 		setter: handlers.setStatus,
+		// 	},
+		// 	type: {
+		// 		data: tableData.type,
+		// 		setter: handlers.setType,
+		// 	},
+		// },
+		data: {
+			executor: tableData.executors,
+			status: tableData.status,
+			type: tableData.type,
+		},
+		setters: useMemo(
+			() => ({
+				executor: handlers.setExecutors,
+				status: handlers.setStatus,
+				type: handlers.setType,
+			}),
+			[handlers],
+		),
 		// user,
 		// login: mutate,
 		// logout: useCallback(() => {
