@@ -44,12 +44,36 @@ export const api = {
 		return response.data;
 	},
 
-	fetchFilteredRows: async (): Promise<any[]> => {
-		const response = await axios.get<any[]>('/api/fetch-filtered-rows');
+	fetchFilteredRows: async (query: string): Promise<{type: 'success'; data: any} | {type: 'error'; data: any}> => {
+		try {
+			console.log('query', query);
 
-		if (response.status !== 200) {
-			throw new Error('user error');
+			// const response = await axios.get<any[]>('/api/fetch-filtered-rows' + query);
+			const response = await axios.get<any[]>('/api/fetch-filtered-rows?' + query);
+
+			if (response.status !== 200) {
+				throw new Error('user error');
+			}
+			return {type: 'success', data: response.data};
+		} catch (error) {
+			console.error('Error fetching filtered rows:', error);
+			// throw error;
+			return {type: 'error', data: error};
 		}
-		return response.data;
+	},
+	fetchExecutors: async (): Promise<{type: 'success'; data: string[]} | {type: 'error'; data: any}> => {
+		try {
+			// const response = await axios.get<any[]>('/api/fetch-filtered-rows' + query);
+			const response = await axios.get<string[]>('/api/fetch-executors');
+
+			if (response.status !== 200) {
+				throw new Error('user error');
+			}
+			return {type: 'success', data: response.data};
+		} catch (error) {
+			console.error('Error fetching filtered rows:', error);
+			// throw error;
+			return {type: 'error', data: error};
+		}
 	},
 };

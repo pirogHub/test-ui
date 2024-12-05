@@ -1,11 +1,13 @@
 import React, {PropsWithChildren, createContext, useContext} from 'react';
 
+import {useTableStore} from '@/state/use-table-hook';
 import {useUserStore} from '@/state/use-user-hook';
 
 const useCustomStore_ = () => {
 	const userStore = useUserStore();
+	const tableStore = useTableStore();
 
-	return {userStore};
+	return {userStore, tableStore};
 };
 
 type CustomStoreType = ReturnType<typeof useCustomStore_>;

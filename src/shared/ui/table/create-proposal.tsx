@@ -111,7 +111,9 @@ const SavedButton = ({onSave}: {onSave: () => void}) => {
 };
 
 const MediumInput: React.FC<React.ComponentProps<typeof InputField>> = ({...props}) => {
-	return <InputField {...props} size={'medium'} sxWrapper={{width: '100%', ...props.sxWrapper}} isWithoutErrors />;
+	return (
+		<InputField {...props} sizeInput={'medium'} sxWrapper={{width: '100%', ...props.sxWrapper}} isWithoutErrors />
+	);
 };
 
 export const CreateProposal = () => {

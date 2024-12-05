@@ -28,6 +28,7 @@ import {
 import {useRouter} from 'next/router';
 
 import {getIconUrlByName} from '@/shared/icons/icons-data';
+import {useCustomStore} from '@/shared/providers/store-provider';
 
 import {Icon2} from '../icon';
 import {StatusBadge, StatusTypes} from '../status-badge/badge-status';
@@ -60,18 +61,6 @@ function createData(
 	};
 }
 
-// const rows: Data[] = [
-// 	createData(1, 1693573214000, 'APP001', 'analyze', 'Task', 'John Doe'),
-// 	createData(2, 1693673214000, 'APP002', 'in-work', 'Bug', 'Jane Smith'),
-// 	createData(3, 1693773214000, 'APP003', 'done', 'Feature', 'Alice Johnson'),
-// 	createData(4, 1693873214000, 'APP004', 'specified', 'Improvement', 'Bob Brown'),
-// 	createData(5, 1693973214000, 'APP005', 'rejected', 'Task', 'Charlie Davis'),
-// 	createData(6, 1694073214000, 'APP006', 'waited', 'Bug', 'Emily White'),
-// 	createData(7, 1694173214000, 'APP007', 'draft', 'Feature', 'Frank Wilson'),
-// 	createData(8, 1694273214000, 'APP008', 'analyze', 'Improvement', 'Grace Lee'),
-// 	createData(9, 1694373214000, 'APP009', 'in-work', 'Task', 'Hank Miller'),
-// 	createData(10, 1694473214000, 'APP010', 'done', 'Bug', 'Ivy Garcia'),
-// ];
 const labelDictionary: Record<keyof Data, string> = {
 	id: 'ID',
 	appNumber: 'Номер заявки',
@@ -79,6 +68,11 @@ const labelDictionary: Record<keyof Data, string> = {
 	status: 'Статус',
 	type: 'Тип',
 	executor: 'Исполнитель',
+};
+
+const dictionaryStatus = {
+	inner: 'Внутренний',
+	outer: 'Внешний',
 };
 
 const labelDictionaryReversed = Object.fromEntries(Object.entries(labelDictionary).map(([key, value]) => [value, key]));
@@ -137,7 +131,7 @@ const CustomizeCellContent: (
 				content = <StatusBadge status={value as StatusTypes} />;
 				break;
 			case 'type':
-				content = <div>{value}</div>;
+				content = <div>{dictionaryStatus[value] || value}</div>;
 				break;
 			case 'executor':
 				content = <div>{value}</div>;
@@ -379,12 +373,12 @@ const ColumnAutosizing = () => {
 	const apiRef = useGridApiRef();
 	// const data = useData(100);
 
-	const tableStore = useTableStore();
-	const {filteredRows, fetchByFilters, getFilteredRowsIsLoading} = tableStore;
+	const {tableStore} = useCustomStore();
+	const {filteredRows, fetchByFiltersForce, getFilteredRowsIsLoading} = tableStore;
 
-	// console.log('filteredRows', getFilteredRowsIsLoading, filteredRows);
-
-	// const filteredRows = [];
+	React.useEffect(() => {
+		fetchByFiltersForce();
+	}, []);
 
 	React.useEffect(() => {
 		if (!apiRef.current) {
@@ -434,7 +428,6 @@ const ColumnAutosizing = () => {
 
 	return (
 		<div style={{width: '100%'}}>
-			<button onClick={fetchByFilters}>Refetch</button>
 			<div style={{width: '100%'}}>
 				<StyledDataGrid
 					onRowClick={({...data}, e) => {
@@ -524,10 +517,7 @@ const CTable = () => {
 	return (
 		<>
 			<Filters />
-			<ColumnAutosizing
-			// CellContentCustomize={(key, data) => CustomizeCellContent(key, data)}
-			// HeaderCellContentCustomize={(id, data) => CustomizeCellContent('id', data, true)}
-			/>
+			<ColumnAutosizing />
 		</>
 	);
 };

@@ -167,7 +167,7 @@ type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	onAutoFill?: (name: string) => void;
 	onChangeValue?: (newValue: string) => void;
 	debounceMs?: number;
-	size?: 'medium' | 'large' | undefined;
+	sizeInput?: 'medium' | 'large' | undefined;
 	isWithoutErrors?: boolean;
 	sxRootContainer?: SxProps;
 	sxWrapper?: SxProps;
@@ -188,7 +188,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 			onAutoFill,
 			onChangeValue,
 			debounceMs,
-			size = 'large', // TODO change name of this prop (some conflict exists) // TODO fix label animation position for "medium"
+			sizeInput = 'large', // TODO change name of this prop (some conflict exists) // TODO fix label animation position for "medium"
 			isWithoutErrors,
 			sxRootContainer,
 			sxWrapper,
@@ -237,7 +237,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 		}, [inputRef, onAutoFill]);
 		return (
 			<RowsWrapper sx={sxWrapper}>
-				<Root sx={sxRootContainer} size={size} className={error ? 'error' : ''}>
+				<Root sx={sxRootContainer} size={sizeInput} className={error ? 'error' : ''}>
 					<div
 						onClick={() => inputRef?.current?.focus()}
 						style={{
