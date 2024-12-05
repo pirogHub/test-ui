@@ -94,7 +94,7 @@ const StyledInputWrapper = styled('div')`
 		left: 5px;
 		top: 50%;
 		transform: translateY(-50%);
-		width: 50px;
+		/* width: 50px; */
 		text-align: center;
 		pointer-events: none;
 		transition: 0.3s ease all;
@@ -106,7 +106,7 @@ const StyledInputWrapper = styled('div')`
 		position: absolute;
 		left: 0;
 		transform: translateY(-150%) translateX(-10%);
-		width: 50px;
+		/* width: 50px; */
 		text-align: center;
 		transition: 0.2s ease all;
 		font-size: 13px;
@@ -115,7 +115,7 @@ const StyledInputWrapper = styled('div')`
 		position: absolute;
 		left: 0;
 		transform: translateY(-150%) translateX(-10%);
-		width: 50px;
+		/* width: 50px; */
 		text-align: center;
 		transition: 0.2s ease all;
 		font-size: 13px;
@@ -176,6 +176,7 @@ type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 	(
 		{
+			// TODO add className props for input, for Root, for Wrapper
 			label,
 			placeholder,
 			error,
@@ -187,7 +188,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 			onAutoFill,
 			onChangeValue,
 			debounceMs,
-			size = 'large',
+			size = 'large', // TODO change name of this prop (some conflict exists) // TODO fix label animation position for "medium"
 			isWithoutErrors,
 			sxRootContainer,
 			sxWrapper,

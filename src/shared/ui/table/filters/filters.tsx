@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
+import {useTableStore} from '@/state/use-table-hook';
 import {skyAllianceMUITheme} from '@/styles/theme';
 import {Fade, Popover, styled} from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
@@ -15,6 +16,7 @@ import {getIconUrlByName} from '@/shared/icons/icons-data';
 import {Icon2} from '../../icon';
 import {InputField} from '../../input';
 import {StatusBadge, StatusTypes, StatusTypesVals} from '../../status-badge/badge-status';
+import {CreateProposal} from '../create-proposal';
 
 const statuses: {key: string; data: StatusTypes}[] = [...StatusTypesVals].map((item) => ({
 	key: item,
@@ -390,19 +392,28 @@ const Filters = <T extends {key: string | number}>({
 	);
 };
 const FiltersVariants = () => {
-	const [selectedStatuses, setSelectedStatuses] = React.useState<string[]>([]);
-	const [selectedAppTypes, setSelectedAppTypes] = React.useState<string[]>([]);
-	const [selectedExecutors, setSelectedExecutors] = React.useState<string[]>([]);
+	// const [selectedStatuses, setSelectedStatuses] = React.useState<string[]>([]);
+	// const [selectedAppTypes, setSelectedAppTypes] = React.useState<string[]>([]);
+	// const [selectedExecutors, setSelectedExecutors] = React.useState<string[]>([]);
 
-	useEffect(() => {
-		console.log('selectedStatuses', selectedStatuses);
-	}, [selectedStatuses]);
-	useEffect(() => {
-		console.log('selectedExecutors', selectedExecutors);
-	}, [selectedExecutors]);
-	useEffect(() => {
-		console.log('selectedAppTypes', selectedAppTypes);
-	}, [selectedAppTypes]);
+	const {
+		selectedStatuses,
+		setSelectedStatuses,
+		selectedAppTypes,
+		setSelectedAppTypes,
+		selectedExecutors,
+		setSelectedExecutors,
+	} = useTableStore();
+
+	// useEffect(() => {
+	// 	console.log('selectedStatuses', selectedStatuses);
+	// }, [selectedStatuses]);
+	// useEffect(() => {
+	// 	console.log('selectedExecutors', selectedExecutors);
+	// }, [selectedExecutors]);
+	// useEffect(() => {
+	// 	console.log('selectedAppTypes', selectedAppTypes);
+	// }, [selectedAppTypes]);
 
 	type RRR = React.ComponentProps<typeof Filters<(typeof executors)[0]>>['filterFunction'];
 	const filterFunction = useCallback<Exclude<RRR, undefined>>(
@@ -454,12 +465,7 @@ const FiltersVariants = () => {
 				)}
 			</div>
 			<div style={{paddingBlock: '20px'}}>
-				<ButtonStyled
-					leftComponent={<Icon2 color="icon2" size={24} url={getIconUrlByName('plus')} />}
-					size="m"
-					view="primary"
-					label="Создать"
-				/>
+				<CreateProposal />
 			</div>
 		</div>
 	);

@@ -1,9 +1,10 @@
 import * as React from 'react';
 
 import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
+import {useTableStore} from '@/state/use-table-hook';
 import {skyAllianceMUITheme} from '@/styles/theme';
 import {getThemedColor} from '@/styles/theme/colors';
-import {MenuItem, PaginationItem, Select} from '@mui/material';
+import {MenuItem, PaginationItem, Select, Skeleton} from '@mui/material';
 import {styled} from '@mui/material';
 import Box from '@mui/material/Box';
 // import * as React from 'react';
@@ -59,18 +60,18 @@ function createData(
 	};
 }
 
-const rows: Data[] = [
-	createData(1, 1693573214000, 'APP001', 'analyze', 'Task', 'John Doe'),
-	createData(2, 1693673214000, 'APP002', 'in-work', 'Bug', 'Jane Smith'),
-	createData(3, 1693773214000, 'APP003', 'done', 'Feature', 'Alice Johnson'),
-	createData(4, 1693873214000, 'APP004', 'specified', 'Improvement', 'Bob Brown'),
-	createData(5, 1693973214000, 'APP005', 'rejected', 'Task', 'Charlie Davis'),
-	createData(6, 1694073214000, 'APP006', 'waited', 'Bug', 'Emily White'),
-	createData(7, 1694173214000, 'APP007', 'draft', 'Feature', 'Frank Wilson'),
-	createData(8, 1694273214000, 'APP008', 'analyze', 'Improvement', 'Grace Lee'),
-	createData(9, 1694373214000, 'APP009', 'in-work', 'Task', 'Hank Miller'),
-	createData(10, 1694473214000, 'APP010', 'done', 'Bug', 'Ivy Garcia'),
-];
+// const rows: Data[] = [
+// 	createData(1, 1693573214000, 'APP001', 'analyze', 'Task', 'John Doe'),
+// 	createData(2, 1693673214000, 'APP002', 'in-work', 'Bug', 'Jane Smith'),
+// 	createData(3, 1693773214000, 'APP003', 'done', 'Feature', 'Alice Johnson'),
+// 	createData(4, 1693873214000, 'APP004', 'specified', 'Improvement', 'Bob Brown'),
+// 	createData(5, 1693973214000, 'APP005', 'rejected', 'Task', 'Charlie Davis'),
+// 	createData(6, 1694073214000, 'APP006', 'waited', 'Bug', 'Emily White'),
+// 	createData(7, 1694173214000, 'APP007', 'draft', 'Feature', 'Frank Wilson'),
+// 	createData(8, 1694273214000, 'APP008', 'analyze', 'Improvement', 'Grace Lee'),
+// 	createData(9, 1694373214000, 'APP009', 'in-work', 'Task', 'Hank Miller'),
+// 	createData(10, 1694473214000, 'APP010', 'done', 'Bug', 'Ivy Garcia'),
+// ];
 const labelDictionary: Record<keyof Data, string> = {
 	id: 'ID',
 	appNumber: 'Номер заявки',
@@ -82,6 +83,13 @@ const labelDictionary: Record<keyof Data, string> = {
 
 const labelDictionaryReversed = Object.fromEntries(Object.entries(labelDictionary).map(([key, value]) => [value, key]));
 
+const LoadingSkeletons = Array.from({length: 3}).map((_, index) => ({
+	id: index,
+	skeleton: (
+		<Skeleton key={index} sx={{width: '100%', height: '100%', bgcolor: '#eee'}} variant="rectangular" height={50} />
+	),
+}));
+
 const CustomizeCellContent: (
 	params: GridRenderCellParams<Data, unknown, unknown, GridTreeNodeWithRender>,
 ) => React.ReactNode = (params) => {
@@ -92,8 +100,32 @@ const CustomizeCellContent: (
 	const key = params.field;
 	let content = null;
 	// const id = rowData.id;
+	// console.log('key', key, value);
+
+	if (key === 'skeleton') return LoadingSkeletons[0].skeleton;
 	if (key === 'id') return null;
-	else {
+	if (!value) {
+		switch (key) {
+			case 'rejectButton':
+				if (!params.row.status || params.row.status === 'rejected' || params.row.status === 'done')
+					content = null;
+				else {
+					content = (
+						<ButtonStyled
+							onClick={(e) => {
+								e.stopPropagation();
+							}}
+							label="Отменить"
+							view="outline"
+						/>
+					);
+				}
+				break;
+			default:
+				content = null;
+				break;
+		}
+	} else {
 		switch (key) {
 			case 'createdAt':
 				content = new Date(value as number).toLocaleString();
@@ -113,26 +145,13 @@ const CustomizeCellContent: (
 			case 'id':
 				content = null;
 				break;
-			case 'rejectButton':
-				if (params.row.status === 'rejected' || params.row.status === 'done') content = null;
-				else {
-					content = (
-						<ButtonStyled
-							onClick={(e) => {
-								e.stopPropagation();
-							}}
-							label="Отменить"
-							view="outline"
-						/>
-					);
-				}
-				break;
+
 			default:
 				content = value;
 				break;
 		}
-		return content;
 	}
+	return content;
 };
 
 const descendingComparator: DataGridProps['columns'][0]['sortComparator'] = (a, b, cell1, cell2) => {
@@ -192,23 +211,7 @@ const Pagination = ({
 				shape="rounded"
 				variant="outlined"
 				renderItem={(item) => {
-					return (
-						<PaginationItem
-							className="Styled-MuiPaginationItem"
-							// sx={{
-							// 	border: 'none',
-							// 	backgroundColor: getThemedColor('base4'),
-							// 	color: 'black',
-
-							// 	'&.MuiPaginationItem-root.Mui-selected': {
-							// 		color: getThemedColor('primary1'),
-							// 		border: 'none',
-							// 		backgroundColor: getThemedColor('base4'),
-							// 	},
-							// }}
-							{...item}
-						/>
-					);
+					return <PaginationItem className="Styled-MuiPaginationItem" {...item} />;
 				}}
 				onChange={(e, newPage) => {
 					onPageChange(newPage - 1);
@@ -218,40 +221,57 @@ const Pagination = ({
 	);
 };
 
-// const CustomPagination = (props: any) => {
-// 	return (
-// 		<TablePagination
-// 			// labelDisplayedRows={({from, to, count}) => `${from}-${to} из ${count}`}
-// 			labelRowsPerPage="Показывать по: "
-// 			labelDisplayedRows={() => ''}
-// 			ActionsComponent={Pagination}
-// 			{...props}
-// 		/>
-// 	);
-// };
 const CustomFooterStatusComponent = (
-	props: NonNullable<GridSlotsComponentsProps['footer']> & {pageSizeOptions: number[]},
+	props: NonNullable<GridSlotsComponentsProps['footer']> & {pageSizeOptions: number[]; disabled?: boolean},
 ) => {
 	const apiRef = useGridApiContext();
 	const pageCount = useGridSelector(apiRef, gridPageCountSelector);
 	const setPageSize = apiRef.current.setPageSize;
 	const setPage = apiRef.current.setPage;
 	const page1 = apiRef.current.state.pagination.paginationModel.page;
-	console.log('apiRef.current', apiRef.current);
+	// console.log('apiRef.current', apiRef.current);
 	const pageSize = apiRef.current.state.pagination.paginationModel.pageSize;
 	const paginationModel = useGridSelector(apiRef, gridPaginationModelSelector);
 	const pageCount2 = useGridSelector(apiRef, gridPageCountSelector);
 	const pageCount3 = useGridSelector(apiRef, gridPageSizeSelector);
 	const pageCountmeta = useGridSelector(apiRef, gridPaginationMetaSelector);
-	console.log('page1', pageCount, page1, pageSize, pageCount2, pageCount3);
-	console.log('pageCountmeta', pageCountmeta);
+	// console.log('page1', pageCount, page1, pageSize, pageCount2, pageCount3);
+	// console.log('pageCountmeta', pageCountmeta);
 
-	const {pageSizeOptions} = props;
+	const {pageSizeOptions, disabled} = props;
 
 	return (
-		<Box sx={{p: 1, display: 'flex', justifyContent: 'space-between'}}>
+		<Box
+			sx={{
+				opacity: disabled ? 0.4 : 1,
+				p: 1,
+				display: 'flex',
+				justifyContent: 'space-between',
+				position: 'relative',
+			}}
+		>
+			{disabled && (
+				<div
+					onClick={(e) => e.stopPropagation()}
+					style={{
+						position: 'absolute',
+						left: 0,
+						top: 0,
+						right: 0,
+						bottom: 0,
+						zIndex: 1,
+						cursor: 'default',
+					}}
+				></div>
+			)}
 			<Pagination page={page1} pageCount={pageCount} onPageChange={setPage} />
-			<div style={{display: 'flex', alignItems: 'center', gap: 12}}>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					gap: 12,
+				}}
+			>
 				<label>Показывать по</label>
 				<TablePaginationSelect
 					// open={false}
@@ -263,7 +283,11 @@ const CustomFooterStatusComponent = (
 					}}
 				>
 					{pageSizeOptions.map((option) => (
-						<MenuItem sx={{padding: 0}} key={option} value={option}>
+						<MenuItem
+							sx={{padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+							key={option}
+							value={option}
+						>
 							{option}
 						</MenuItem>
 					))}
@@ -272,9 +296,6 @@ const CustomFooterStatusComponent = (
 		</Box>
 	);
 };
-const ColumnSortedDescendingIcon = ({...props}) => (
-	<Icon2 color="icon2" url={getIconUrlByName('sortArrows')} size={20} />
-);
 
 const StyledDataGrid = styled(DataGrid)(({theme}) => {
 	const colors = (theme as skyAllianceMUITheme).colors;
@@ -321,6 +342,9 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 			},
 		},
 		'& .MuiDataGrid-cell': {
+			'&:has(.MuiSkeleton-root)': {
+				paddingInline: 0,
+			},
 			'&:focus, &:focus-within': {
 				outline: 'none',
 			},
@@ -355,6 +379,13 @@ const ColumnAutosizing = () => {
 	const apiRef = useGridApiRef();
 	// const data = useData(100);
 
+	const tableStore = useTableStore();
+	const {filteredRows, fetchByFilters, getFilteredRowsIsLoading} = tableStore;
+
+	// console.log('filteredRows', getFilteredRowsIsLoading, filteredRows);
+
+	// const filteredRows = [];
+
 	React.useEffect(() => {
 		if (!apiRef.current) {
 			return;
@@ -365,7 +396,20 @@ const ColumnAutosizing = () => {
 
 	const [isWithReject, setIsWithReject] = React.useState(true);
 	const columns = React.useMemo(() => {
-		const keys = Object.keys(rows[0]);
+		if (getFilteredRowsIsLoading || !filteredRows || !filteredRows?.length || !filteredRows[0]) {
+			const loading: DataGridProps['columns'] = [
+				{
+					field: 'skeleton',
+					headerName: '',
+					resizable: false,
+					sortable: false,
+					flex: 1,
+					renderCell: CustomizeCellContent,
+				},
+			];
+			return loading;
+		}
+		const keys = Object.keys(filteredRows?.[0]);
 		if (isWithReject) {
 			keys.push('rejectButton');
 		}
@@ -384,17 +428,18 @@ const ColumnAutosizing = () => {
 				};
 				return item;
 			});
-	}, [isWithReject]);
+	}, [filteredRows, getFilteredRowsIsLoading, isWithReject]);
 
 	const router = useRouter();
 
 	return (
 		<div style={{width: '100%'}}>
+			<button onClick={fetchByFilters}>Refetch</button>
 			<div style={{width: '100%'}}>
 				<StyledDataGrid
 					onRowClick={({...data}, e) => {
 						const row = data.row as Data;
-						console.log('row row', data, e);
+						// console.log('row row', data, e);
 
 						router.push(`/application/${row.appNumber}`).catch(() => {});
 					}}
@@ -420,7 +465,12 @@ const ColumnAutosizing = () => {
 						),
 						// pagination: CustomPagination,
 						// pagination: Pagination,
-						footer: () => <CustomFooterStatusComponent pageSizeOptions={[5, 10, 25]} />, //CustomFooterStatusComponent,
+						footer: () => (
+							<CustomFooterStatusComponent
+								disabled={getFilteredRowsIsLoading}
+								pageSizeOptions={[5, 10, 25]}
+							/>
+						), //CustomFooterStatusComponent,
 
 						// columnUnsortedIcon: UnsortedIcon,
 					}}
@@ -453,7 +503,13 @@ const ColumnAutosizing = () => {
 						},
 					}}
 					columns={columns}
-					rows={rows}
+					// rows={[
+					// 	{id: '1', key: 'skeleton'},
+					// 	{id: '2', key: 'skeleton'},
+					// ]}
+					loading={getFilteredRowsIsLoading}
+					rows={getFilteredRowsIsLoading ? LoadingSkeletons : filteredRows}
+					// rows={LoadingSkeletons}
 					initialState={{
 						pagination: {paginationModel: {pageSize: 5}},
 					}}

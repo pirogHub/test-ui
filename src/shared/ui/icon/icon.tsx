@@ -89,7 +89,8 @@ const Root = styled('div', {
 		propName !== 'colorActive' &&
 		propName !== 'mobileProps' &&
 		propName !== 'colorManual' &&
-		propName !== 'colorManualActive',
+		propName !== 'colorManualActive' &&
+		propName !== 'isNotIcon',
 })<IconProps2>`
 	${(p) => getIconStyles(p, p.theme as skyAllianceMUITheme)};
 `;

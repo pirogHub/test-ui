@@ -3,6 +3,7 @@ import React from 'react';
 import '@/styles/globals.css';
 import type {AppProps} from 'next/app';
 
+import MainProvider from '@/shared/providers/main-provider';
 import {CustomThemeProvider} from '@/shared/providers/theme-provider';
 
 const Layout = ({children}: {children: React.ReactNode}) => {
@@ -22,11 +23,13 @@ const Layout = ({children}: {children: React.ReactNode}) => {
 export default function App({Component, pageProps: {...pageProps}}: AppProps) {
 	return (
 		// <ThemeProvider theme={theme}>
-		<CustomThemeProvider>
+		// <CustomThemeProvider>
+		<MainProvider>
 			<Layout>
 				<Component {...pageProps} />
 			</Layout>
-		</CustomThemeProvider>
+		</MainProvider>
+		// </CustomThemeProvider>
 		// </ThemeProvider>
 	);
 }

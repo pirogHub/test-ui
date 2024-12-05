@@ -4,7 +4,7 @@ import {useForm} from 'react-hook-form';
 import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
 import {skyAllianceMUITheme} from '@/styles/theme';
 import {getThemedColor} from '@/styles/theme/colors';
-import Header from '@/widgets/header/header';
+import {SkyHeader} from '@/widgets';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {styled} from '@mui/material';
 
@@ -96,7 +96,7 @@ const LoginPage = () => {
 
 	return (
 		<>
-			<Header />
+			<SkyHeader />
 
 			<div
 				style={{
