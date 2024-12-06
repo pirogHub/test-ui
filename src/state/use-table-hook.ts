@@ -96,7 +96,7 @@ export const useTableStore = () => {
 	const dataRef = useRef(data);
 	dataRef.current = data;
 
-	const filteredRows = useAppSelector((state) => state.table.filteredRows);
+	const fetchedRowsByFilters = useAppSelector((state) => state.table.fetchedRowsByFilters);
 
 	useEffect(() => {
 		const notEmptyFilters = {
@@ -129,13 +129,14 @@ export const useTableStore = () => {
 			[handlers],
 		),
 		setSorting: handlers.setSorting,
+		setShowedFiltersOrder: handlers.setShowedFiltersOrder,
 
 		showedFiltersOrder,
 		sorting,
 		getFilteredRowsError,
 		getFilteredRowsIsLoading: getFilteredRowsIsLoading, // || isRowsLoading,
 		fetchByFiltersForce: fetchByQuery,
-		filteredRows,
+		fetchedRowsByFilters,
 		isAutoUpdate,
 		setIsAutoUpdate,
 	};

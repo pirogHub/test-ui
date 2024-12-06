@@ -24,6 +24,7 @@ const Root = styled('div', {
 	border: 1px solid ${({theme}) => (theme as skyAllianceMUITheme).colors.base4};
 	border-radius: 12px;
 	display: inline-flex;
+	background-color: ${({theme}) => (theme as skyAllianceMUITheme).colors.base1};
 
 	height: ${(p) => (p.size === 'medium' ? '44px' : '56px')};
 	box-sizing: border-box;

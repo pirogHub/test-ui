@@ -453,14 +453,16 @@ const ColumnAutosizing = () => {
 	// const data = useData(100);
 
 	const {tableStore} = useCustomStore();
-	const {filteredRows, getFilteredRowsIsLoading, sorting, setSorting} = tableStore;
+	const {fetchedRowsByFilters, getFilteredRowsIsLoading, sorting, setSorting} = tableStore;
 
-	const sizablefilteredRows = React.useMemo(() => {
-		const isNeed = filteredRows.length < 5;
-		console.log('isNeed', isNeed, 'filteredRows', filteredRows.length);
-		const res = isNeed ? [...filteredRows, ...getEmptyRows(5 - (filteredRows.length || 0))] : filteredRows;
+	const sizablefetchedRowsByFilters = React.useMemo(() => {
+		const isNeed = fetchedRowsByFilters.length < 5;
+		console.log('isNeed', isNeed, 'fetchedRowsByFilters', fetchedRowsByFilters.length);
+		const res = isNeed
+			? [...fetchedRowsByFilters, ...getEmptyRows(5 - (fetchedRowsByFilters.length || 0))]
+			: fetchedRowsByFilters;
 		return res;
-	}, [filteredRows]);
+	}, [fetchedRowsByFilters]);
 	// React.useEffect(() => {
 	// 	fetchByFiltersForce();
 	// }, []);
@@ -474,15 +476,25 @@ const ColumnAutosizing = () => {
 	}, [apiRef]);
 
 	const headerKeys = React.useMemo(() => {
-		if (getFilteredRowsIsLoading || !filteredRows || !filteredRows?.length || !filteredRows[0]) {
+		if (
+			getFilteredRowsIsLoading ||
+			!fetchedRowsByFilters ||
+			!fetchedRowsByFilters?.length ||
+			!fetchedRowsByFilters[0]
+		) {
 			return [];
 		}
-		return Object.keys(filteredRows?.[0]);
-	}, [filteredRows, getFilteredRowsIsLoading]);
+		return Object.keys(fetchedRowsByFilters?.[0]);
+	}, [fetchedRowsByFilters, getFilteredRowsIsLoading]);
 
 	const [isWithReject, setIsWithReject] = React.useState(true);
 	const columns = React.useMemo(() => {
-		if (getFilteredRowsIsLoading || !filteredRows || !filteredRows?.length || !filteredRows[0]) {
+		if (
+			getFilteredRowsIsLoading ||
+			!fetchedRowsByFilters ||
+			!fetchedRowsByFilters?.length ||
+			!fetchedRowsByFilters[0]
+		) {
 			const loading: DataGridProps['columns'] = [
 				{
 					field: 'skeleton',
@@ -495,7 +507,7 @@ const ColumnAutosizing = () => {
 			];
 			return loading;
 		}
-		const keys = Object.keys(filteredRows?.[0]);
+		const keys = Object.keys(fetchedRowsByFilters?.[0]);
 		if (isWithReject) {
 			keys.push('rejectButton');
 		}
@@ -532,7 +544,7 @@ const ColumnAutosizing = () => {
 				};
 				return item;
 			});
-	}, [filteredRows, sorting, getFilteredRowsIsLoading, isWithReject]);
+	}, [fetchedRowsByFilters, sorting, getFilteredRowsIsLoading, isWithReject]);
 
 	const router = useRouter();
 
@@ -606,7 +618,7 @@ const ColumnAutosizing = () => {
 					// ]}
 					loading={getFilteredRowsIsLoading}
 					// @ts-expect-error toremove
-					rows={getFilteredRowsIsLoading ? LoadingSkeletons : sizablefilteredRows}
+					rows={getFilteredRowsIsLoading ? LoadingSkeletons : sizablefetchedRowsByFilters}
 					// rows={LoadingSkeletons}
 					initialState={{
 						pagination: {paginationModel: {pageSize: 5}},
