@@ -1,1 +1,1 @@
-export {Budge} from './Budge';
+export {Badge} from './badge';

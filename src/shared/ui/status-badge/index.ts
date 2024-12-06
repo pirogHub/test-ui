@@ -1,1 +1,1 @@
-export {StatusBudge} from './Budge-status';
+export {StatusBadge} from './badge-status';

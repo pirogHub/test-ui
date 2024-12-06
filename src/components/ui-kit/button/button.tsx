@@ -31,18 +31,12 @@ const Button: React.FC<React.PropsWithChildren<ButtonProps>> = ({
 	children,
 	leftComponent,
 	rightComponent,
-	// isRounded,
 	...props
 }) => {
 	const isChildrenExist = label || children;
-	// const iconColor = props.variant === 'contained' ? 'white' : '#2EACFB';
 
 	const sx = {
 		...(!isChildrenExist ? getOnlyIconStyles(props.size) : {}),
-		// ...(isRounded ? {borderRadius: '50%'} : {}),
-		// '& .SkyIcon': {
-		// 	backgroundColor: iconColor,
-		// },
 	};
 
 	return (

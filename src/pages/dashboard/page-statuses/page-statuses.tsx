@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Header} from '@/components/header';
 
-import {StatusBudge} from '@/shared/ui/status-Budge';
+import {StatusBadge} from '@/shared/ui/status-badge';
 
 const PageStatuses = () => {
 	return (
@@ -26,13 +26,13 @@ const PageStatuses = () => {
 						alignItems: 'start',
 					}}
 				>
-					<StatusBudge status="analyze" />
-					<StatusBudge status="in-work" />
-					<StatusBudge status="done" />
-					<StatusBudge status="specified" />
-					<StatusBudge status="rejected" />
-					<StatusBudge status="waited" />
-					<StatusBudge status="draft" />
+					<StatusBadge status="analyze" />
+					<StatusBadge status="in-work" />
+					<StatusBadge status="done" />
+					<StatusBadge status="specified" />
+					<StatusBadge status="rejected" />
+					<StatusBadge status="waited" />
+					<StatusBadge status="draft" />
 				</div>
 			</div>
 		</div>

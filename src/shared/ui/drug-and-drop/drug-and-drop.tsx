@@ -1,10 +1,11 @@
 import React, {useRef, useState} from 'react';
 
+import {skyAllianceMUITheme} from '@/styles/theme';
 import {CircularProgress, styled} from '@mui/material';
 
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 
-import {Budge} from '../badge';
+import {Badge} from '../badge';
 import {Icon2} from '../icon';
 
 const Container = styled('div')`
@@ -16,25 +17,26 @@ const Container = styled('div')`
 
 const DropArea = styled('div')`
 	flex: 1;
-	border: 2px dashed #ccc;
+	border: 2px dashed ${(p) => (p.theme as skyAllianceMUITheme).colors.base3};
 	border-radius: 10px;
 	padding: 20px;
 	text-align: center;
-	color: rgba(27, 31, 59, 0.4);
+	color: ${(p) => (p.theme as skyAllianceMUITheme).colors.text4};
 	cursor: pointer;
 	transition: all 0.4s ease;
 	font-weight: 600;
 
 	&:hover,
 	&.onDrugOver {
-		border-color: rgba(46, 172, 251, 1);
-		/* color: #007bff; */
-	}
+		border-color: ${(p) => (p.theme as skyAllianceMUITheme).colors.primary1};
 
-	&.onDrugOver {
-		background-color: rgba(46, 172, 251, 0.15);
+		background-color: ${(p) => (p.theme as skyAllianceMUITheme).colors.backgroundAccent};
 		border-style: solid;
 		border-width: 2px;
+	}
+
+	& .inner-text {
+		color: ${(p) => (p.theme as skyAllianceMUITheme).colors.primary1};
 	}
 `;
 
@@ -47,20 +49,6 @@ const FileList = styled('div')`
 
 const FileInput = styled('input')`
 	display: none;
-`;
-
-const Button = styled('button')`
-	margin-top: 10px;
-	padding: 8px 15px;
-	background-color: #007bff;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-
-	&:hover {
-		background-color: #0056b3;
-	}
 `;
 
 interface FileData {
@@ -147,7 +135,6 @@ export const DrugAndDrop: React.FC = () => {
 
 	return (
 		<Container>
-			{/* Drop area */}
 			<DropArea
 				className={isOnDrugOver ? 'onDrugOver' : ''}
 				onDrop={handleDrop}
@@ -163,20 +150,19 @@ export const DrugAndDrop: React.FC = () => {
 				onClick={() => document.getElementById('fileInput')?.click()}
 			>
 				<p>
-					<span style={{color: 'rgba(46, 172, 251, 1)'}}>Прикрепите документ</span> или перетащите файл сюда
+					<span className="inner-text">Прикрепите документ</span> или перетащите файл сюда
 				</p>
 				<FileInput id="fileInput" type="file" multiple onChange={handleFileSelect} />
 			</DropArea>
 
-			{/* File list */}
 			<FileList>
 				{files.map((file, index) => {
 					console.log(file.progress);
 
 					return (
-						<Budge
-							color="rgba(35, 31, 35, 1)"
-							backgroundColor="rgba(245, 245, 245, 1)"
+						<Badge
+							color="text1"
+							backgroundColor="base7"
 							key={index}
 							label={file.name}
 							leftIcon={

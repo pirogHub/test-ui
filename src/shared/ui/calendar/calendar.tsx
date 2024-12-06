@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 
 import {ButtonProps, ButtonStyled} from '@/components/ui-kit/button/button-styled';
+import {skyAllianceMUITheme} from '@/styles/theme';
 import {ChevronLeft, ChevronRight} from '@mui/icons-material';
 import {IconButton, Stack, Typography, styled} from '@mui/material';
 import {DateCalendar, PickersCalendarHeaderProps, PickersDay, PickersDayProps} from '@mui/x-date-pickers';
@@ -37,18 +38,28 @@ dayjs.updateLocale('ru', {
 	weekdaysMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'], // Минимальные сокращения для дней недели
 });
 
-const Wrapper = styled('div')({
-	border: '1px solid #EAEAEA',
-	boxShadow: '0px 0px 16px 0px #2C2D2E14',
+const Wrapper = styled('div')(({theme}) => ({
+	border: `1px solid ${(theme as skyAllianceMUITheme)?.colors?.base4}`,
+	boxShadow: '0px 0px 16px 0px rgba(44, 45, 46, 0.08)',
 	borderRadius: '12px',
 	display: 'inline-flex',
 	alignItems: 'center',
 	flexDirection: 'column',
 	width: '338px',
-});
+
+	'& .footer-buttons-wrapper': {
+		color: (theme as skyAllianceMUITheme)?.colors?.primary1,
+		height: '44px',
+		boxShadow: '0px 1px 0px 0px rgb(221, 223, 224) inset',
+		width: '100%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+}));
 
 // Стилизация календаря
-const StyledStaticDatePicker = styled(DateCalendar)({
+const StyledStaticDatePicker = styled(DateCalendar)(({theme}) => ({
 	'.MuiPickersCalendarHeader-root': {
 		position: 'relative',
 
@@ -80,7 +91,7 @@ const StyledStaticDatePicker = styled(DateCalendar)({
 		width: '100%',
 	},
 	'.MuiPickersArrowSwitcher-button': {
-		color: '#2EACFB',
+		color: (theme as skyAllianceMUITheme)?.colors?.primary1,
 	},
 
 	'.MuiPickersFadeTransitionGroup-root ': {
@@ -94,7 +105,35 @@ const StyledStaticDatePicker = styled(DateCalendar)({
 		border: 'none !important',
 		position: 'relative',
 	},
-});
+
+	'& .current-date-underline-color': {
+		backgroundColor: (theme as skyAllianceMUITheme)?.colors?.text2,
+	},
+
+	'& .header-year-label, & .header-schevron-svg': {
+		color: (theme as skyAllianceMUITheme)?.colors?.primary1,
+	},
+}));
+
+// Кастомный заголовок календаря
+const StyledPickersDay = styled(PickersDay, {
+	shouldForwardProp: (prop) => prop !== 'isWeekend' && prop !== 'isAnotherMonth',
+})<{
+	isWeekend?: boolean;
+	isAnotherMonth?: boolean;
+}>`
+	background-color: transparent;
+	opacity: ${(p) => (p.isAnotherMonth ? 0.5 : 1)};
+	color: ${(p) =>
+		p.isWeekend ? (p.theme as skyAllianceMUITheme).colors?.error : (p.theme as skyAllianceMUITheme)?.colors?.text2};
+
+	& .today-underline {
+		background-color: ${(p) => (p.theme as skyAllianceMUITheme).colors?.text2};
+		width: 12px;
+		height: 2px;
+		border-radius: 6px;
+	}
+`;
 
 // Кастомный заголовок календаря
 const CustomCalendarHeaderRoot = styled('div')({
@@ -106,13 +145,13 @@ const CustomCalendarHeaderRoot = styled('div')({
 const CustomDay = (props: PickersDayProps<dayjs.Dayjs>) => {
 	const dayNum = props.day.day();
 
-	const sx = {
-		...(props.outsideCurrentMonth ? {opacity: 0.5} : {}),
-		...(dayNum === 6 || dayNum === 0 ? {color: '#DD4C1E'} : {color: '#1B1F3BCC'}),
-	};
-
 	return (
-		<PickersDay {...props} sx={{...props.sx, ...sx}} disableRipple>
+		<StyledPickersDay
+			{...props}
+			isAnotherMonth={props.outsideCurrentMonth}
+			isWeekend={dayNum === 6 || dayNum === 0}
+			disableRipple
+		>
 			{props.day.format('D')}
 			{props.today ? (
 				<div
@@ -126,10 +165,10 @@ const CustomDay = (props: PickersDayProps<dayjs.Dayjs>) => {
 						alignItems: 'center',
 					}}
 				>
-					<div style={{backgroundColor: '#1B1F3BCC', width: '12px', height: '2px', borderRadius: '6px'}} />
+					<div className="today-underline" />
 				</div>
 			) : null}
-		</PickersDay>
+		</StyledPickersDay>
 	);
 };
 
@@ -144,7 +183,8 @@ const CustomYearButton = (
 			className="MuiPickersYear-root"
 			view="flatted"
 			active={props.ownerState.selected}
-			sx={{color: '#1B1F3BCC', fontWeight: '500 !important'}}
+			color="text2"
+			sx={{fontWeight: '500 !important'}}
 		>
 			{props.ownerState.value}
 			{props.ownerState.selected ? (
@@ -159,7 +199,14 @@ const CustomYearButton = (
 						alignItems: 'center',
 					}}
 				>
-					<div style={{backgroundColor: '#1B1F3BCC', width: '12px', height: '2px', borderRadius: '6px'}} />
+					<div
+						className="current-date-underline-color"
+						style={{
+							width: '12px',
+							height: '2px',
+							borderRadius: '6px',
+						}}
+					/>
 				</div>
 			) : null}
 		</ButtonStyled>
@@ -188,7 +235,7 @@ const CustomCalendarHeader = (props: PickersCalendarHeaderProps<dayjs.Dayjs>) =>
 		<CustomCalendarHeaderRoot {...props}>
 			<Stack spacing={1} direction="row">
 				<IconButton onClick={selectPreviousMonth} title="Previous month">
-					<ChevronLeft htmlColor="#2EACFB" />
+					<ChevronLeft className="header-chevron-svg" />
 				</IconButton>
 			</Stack>
 			<Typography
@@ -202,11 +249,11 @@ const CustomCalendarHeader = (props: PickersCalendarHeaderProps<dayjs.Dayjs>) =>
 				}}
 			>
 				<span>{currentMonth.locale('ru').format('MMMM')}</span>
-				<span style={{color: '#2EACFB'}}>{currentMonth.format('YYYY')}</span>
+				<span className="header-year-label">{currentMonth.format('YYYY')}</span>
 			</Typography>
 			<Stack spacing={1} direction="row">
 				<IconButton onClick={selectNextMonth} title="Next month">
-					<ChevronRight htmlColor="#2EACFB" />
+					<ChevronRight className="header-chevron-svg" />
 				</IconButton>
 			</Stack>
 		</CustomCalendarHeaderRoot>
@@ -237,17 +284,7 @@ export const Calendar = () => {
 					views={['year', 'month', 'day']}
 				/>
 			</LocalizationProvider>
-			<div
-				style={{
-					color: '#2EACFB',
-					height: '44px',
-					boxShadow: '0px 1px 0px 0px #DDDFE0 inset',
-					width: '100%',
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-				}}
-			>
+			<div className="footer-buttons-wrapper">
 				<ButtonStyled
 					view="flatted"
 					onClick={setToday}

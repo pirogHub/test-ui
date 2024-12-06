@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {skyAllianceMUITheme} from '@/styles/theme';
+import {SkyAllianceBaseColorsNamesType} from '@/styles/theme/colors';
 import {styled} from '@mui/material';
 
 interface IconProps {
@@ -19,16 +21,21 @@ interface IconProps2 {
 	size?: Size;
 	url: string;
 	round?: boolean;
-	color?: string;
-	colorActive?: string;
+	color?: SkyAllianceBaseColorsNamesType;
+	colorActive?: SkyAllianceBaseColorsNamesType;
 
-	colorHex?: string;
+	colorManual?: string;
+	colorManualActive?: string;
 
 	mobileProps?: Partial<Omit<IconProps, 'mobileProps'>>;
 	isNotIcon?: boolean;
 }
 
-const getIconStyles = (p: IconProps2) => `
+const getIconStyles = (p: IconProps2, theme: skyAllianceMUITheme) => {
+	const color = p.color ? theme.colors[p.color] : p.colorManual;
+	const colorActive = p.colorActive ? theme.colors[p.colorActive] : p.colorManualActive;
+
+	return `
     transition: all 0s;
     ${(() => {
 		if (!p.size) return '';
@@ -51,21 +58,13 @@ const getIconStyles = (p: IconProps2) => `
     `;
 	})()};
     ${(() =>
-		// p.color !== undefined || p.colorHex !== undefined || p.colorActive !== undefined
 		!p.isNotIcon
 			? `
             mask-image: url('${p.url}');
             mask-repeat: no-repeat;
             mask-size: contain;
             mask-position: center;
-            ${
-				p.colorHex !== undefined
-					? `background-color: ${p.colorHex}`
-					: p.color !== undefined
-						? // ? themedColor(p.color, 'background-color')
-							`background-color: ${p.color}`
-						: ''
-			};
+            ${color !== undefined ? `background-color: ${color}` : ''};
             ${p.round && 'mask-size: cover;'};
     `
 			: `
@@ -76,8 +75,9 @@ const getIconStyles = (p: IconProps2) => `
             ${p.round && 'background-size: cover;'};
     `)()};
     ${(() => p.round && `border-radius: 50%;`)()};
-    ${(() => (p.colorActive !== undefined ? `${`background-color: ${p.color}`}` : ''))()}
+    ${(() => (colorActive !== undefined ? `${`background-color: ${colorActive}`}` : ''))()}
 `;
+};
 
 const Root = styled('div', {
 	shouldForwardProp: (propName) =>
@@ -88,9 +88,11 @@ const Root = styled('div', {
 		propName !== 'color' &&
 		propName !== 'colorActive' &&
 		propName !== 'mobileProps' &&
-		propName !== 'colorHex',
+		propName !== 'colorManual' &&
+		propName !== 'colorManualActive' &&
+		propName !== 'isNotIcon',
 })<IconProps2>`
-	${(p) => getIconStyles(p)};
+	${(p) => getIconStyles(p, p.theme as skyAllianceMUITheme)};
 `;
 
 export const Icon2: React.FC<React.ComponentProps<typeof Root>> = (props) => <Root className="SkyIcon" {...props} />;

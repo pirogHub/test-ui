@@ -8,7 +8,7 @@ import TableButtonMulti from './table-button-muilti';
 const Table = styled('div')`
 	display: grid;
 	grid-template-columns: 200px repeat(4, 1fr); /* Первая колонка шире */
-	border: 1px solid #ddd;
+	border: 1px solid rgb(221, 221, 221);
 `;
 
 const HeaderCell = styled('div')`

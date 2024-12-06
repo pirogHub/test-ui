@@ -1,22 +1,22 @@
 import React from 'react';
 
-import {Grid2, styled} from '@mui/material';
+import {styled} from '@mui/material';
 
 import {getIconUrlByName} from '@/shared/icons/icons-data';
-import Icon, {Icon2} from '@/shared/ui/icon/icon';
-import {FlexRow} from '@/shared/ui/layout';
+import {Icon2} from '@/shared/ui/icon/icon';
 
-import Button from './button';
-import {ButtonSize, ButtonStyled, ButtonView} from './button-styled';
+import {
+	//
+	ButtonSize,
+	ButtonStyled,
+	ButtonView,
+} from './button-styled';
 
 interface TableButtonProps {
 	view: ButtonView;
 	// size: 'mylarge' | 'mysmall';
 	size: ButtonSize;
 }
-
-const states = ['normal', 'hover', 'active', 'disabled'];
-const configurations = ['default', 'with left icon', 'with right icon', 'only icon'];
 
 const Cell = styled('div')`
 	text-align: center;
@@ -26,14 +26,6 @@ const Cell = styled('div')`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-`;
-
-const RowLabel = styled('div')`
-	font-weight: bold;
-	text-align: left;
-	padding: 10px;
-	background-color: #f7f7f7;
-	border: 1px solid #ddd;
 `;
 
 const FourButtonsRow = ({

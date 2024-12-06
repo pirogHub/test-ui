@@ -13,6 +13,7 @@ export const CustomThemeProvider: React.FC<PropsWithChildren> = ({children}) => 
 	const [isDarkMode, setIsDarkMode] = useState(false);
 
 	const toggleTheme = () => setIsDarkMode((prev) => !prev);
+	console.log('server');
 
 	const currentTheme = useMemo(() => (isDarkMode ? skyAllianceDarkTheme : skyAllianceLightTheme), [isDarkMode]);
 
