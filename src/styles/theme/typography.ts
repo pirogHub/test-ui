@@ -1,4 +1,4 @@
-const Typography = {
+export const Typography = {
 	// Heading
 	heading: {
 		large: {

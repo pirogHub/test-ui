@@ -62,7 +62,7 @@ const TableButtonMulti = ({view, size}: TableButtonProps) => {
 				rowName="left icon"
 				view={view}
 				size={size}
-				leftComponent={<Icon2 color="red" size={iconSize} url={getIconUrlByName('search')} />}
+				leftComponent={<Icon2 color="icon2" size={iconSize} url={getIconUrlByName('search')} />}
 			/>
 
 			<FourButtonsRow

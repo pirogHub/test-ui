@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit --skipLibCheck",
+    "lint:check": "eslint --max-warnings=0 \"**/*.{ts,tsx,js,jsx}\""
   },
   "dependencies": {
     "@emotion/react": "^11.13.5",
@@ -27,6 +29,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.2",
     "react-redux": "^9.1.2",
+    "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "zod": "^3.23.8"
   },

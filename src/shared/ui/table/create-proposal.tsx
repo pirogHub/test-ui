@@ -87,7 +87,7 @@ const SavedButton = ({onSave}: {onSave: () => void}) => {
 								/>
 							</div>
 							<SavedButtonModalDescription>
-								Это позволит сохранить вам введенные данные и вернуться к ним позже
+								Это позволит сохранить вам введенные данные и вернуться к ним позже
 							</SavedButtonModalDescription>
 						</ContentWrapper>
 						<div style={{paddingInline: '16px', paddingTop: 0}} className="footer">

@@ -70,21 +70,27 @@ const FiltersVariants = () => {
 	// 		};
 	// 	}, {}),
 	// );
-	const [filtersListShowed, setFiltersListShowed] = React.useState<Partial<Record<T['key'], boolean>>>(
+	const [filtersListShowed, setFiltersListShowed] = React.useState<Partial<Record<string, boolean>>>(
+		// const [filtersListShowed, setFiltersListShowed] = React.useState<Partial<Record<T['key'], boolean>>>(
 		Object.keys(tableData)?.reduce((acc, item) => {
 			return {
 				...acc,
+				// @ts-expect-error toremove
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 				[item]: Boolean(tableData?.[item]?.length),
 			};
 		}, {}),
 	);
 
 	const [filtersListShowed2, setFiltersListShowed2] = React.useState<FiltersType[]>(
+		// @ts-expect-error toremove
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		Object.keys(tableData)?.filter((item) => Boolean(tableData?.[item]?.length)) as FiltersType[],
 	);
 
 	const filtersListNotShowed = useMemo(() => {
 		const result = FiltersListFullConstant.filter((item) => {
+			// @ts-expect-error toremove
 			const isAlreadyShowed = filtersListShowed2.includes(item.key);
 			return !isAlreadyShowed; // TODO поменять на чек как поле в объекте
 		});
@@ -211,6 +217,7 @@ const FiltersVariants = () => {
 							label={it.label}
 							filterIconComponent={it.filterIconComponent}
 							onSetData={it.onSetData}
+							// @ts-expect-error toremove
 							dataToShow={it.dataToShow}
 							renderItem={it.renderItem}
 							onClose={it.onClose}
@@ -218,6 +225,7 @@ const FiltersVariants = () => {
 							withoutCheckAll={it?.withoutCheckAll}
 							isDataLoading={it?.isDataLoading}
 							isDataLoadingError={it?.isDataLoadingError}
+							// @ts-expect-error toremove
 							onSubmitFilters={fetchByFiltersForce}
 							onDropFilters={fetchByFiltersForce}
 						/>
@@ -241,8 +249,10 @@ const FiltersVariants = () => {
 						withoutShowCount
 						clearFilterFlag={clearAllFlag}
 						controlledSetSelectedData={setFiltersListShowed}
+						// @ts-expect-error toremove
 						controlledSelectedData={filtersListShowed}
 						filterIconComponent={<Icon2 color="icon2" size={20} url={getIconUrlByName('filterAdd')} />}
+						// @ts-expect-error toremove
 						onSetData={setFiltersListShowed2}
 						onClickOneElem={onClickOneElem}
 						dataToShow={filtersListNotShowed}

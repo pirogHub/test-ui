@@ -1,10 +1,9 @@
-import {use, useCallback, useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import {api} from '@/api/base';
 import {useMutation, useQuery} from '@tanstack/react-query';
 
 import {useAppDispatch, useAppSelector} from './store';
-import {User} from './types';
 import {logout, setUser} from './user.slice';
 
 export const useUserStore = () => {
@@ -21,7 +20,7 @@ export const useUserStore = () => {
 		onSuccess: (userData) => {
 			dispatch(setUser(userData.user));
 		},
-		onError: (error) => {
+		onError: () => {
 			dispatch(logout());
 		},
 	});

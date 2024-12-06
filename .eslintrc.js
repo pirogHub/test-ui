@@ -83,7 +83,7 @@ module.exports = {
 		'check-file/filename-naming-convention': [
 			ERROR,
 			{
-				'**/*/!(_app|_document).{js,ts,jsx,tsx}': 'KEBAB_CASE',
+				'**/*/!(_app|_document|[id]).{js,ts,jsx,tsx}': 'KEBAB_CASE',
 				'**/*/': 'KEBAB_CASE',
 			},
 			{

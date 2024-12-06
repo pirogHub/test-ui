@@ -1,13 +1,14 @@
 import React from 'react';
 
 import {Header} from '@/components/header';
-import ButtonTableCss from '@/components/ui-kit/button/button-table-css';
+
+// import ButtonTableCss from '@/components/ui-kit/button/button-table-css';
 
 export const PageButtons = () => {
 	return (
 		<div>
 			<Header />
-			<ButtonTableCss />
+			{/* <ButtonTableCss /> */}
 		</div>
 	);
 };
