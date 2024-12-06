@@ -13,7 +13,6 @@ export const Header = () => {
 	const {toggleTheme} = useThemeToggle();
 	return (
 		<>
-			<SkyHeader />
 			<div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
 				<ul style={{display: 'flex', gap: '10px', flexDirection: 'column'}}>
 					<li>

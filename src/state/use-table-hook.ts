@@ -4,6 +4,8 @@ import {api} from '@/api/base';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {bindActionCreators} from 'redux';
 
+import {useNormalQuery} from '@/shared/hooks/use-normal-query';
+
 import {useAppDispatch, useAppSelector} from './store';
 import {tableActions} from './table.slice';
 
@@ -15,23 +17,26 @@ const createQueryParamsFromFilter = (filters: Record<string, unknown>) => {
 				newQuery.set(key, JSON.stringify(value));
 			}
 		} else if (value) {
+			//  if (value && typeof value === 'object') {
+			// 	newQuery.set(key, createQueryParamsFromFilter(value));
+			// }
 			newQuery.set(key, JSON.stringify(value));
 		}
 	});
 	return newQuery.toString();
 };
 
-const fetcher = async (options) => {
-	console.log('options', options);
+// const fetcher = async (options) => {
+// 	console.log('options', options);
 
-	const res = await api.fetchFilteredRows(options.queryKey[0]);
+// 	const res = await api.fetchFilteredRows(options.queryKey[0]);
 
-	if (res.type === 'success') {
-		return res.data;
-	} else {
-		return data;
-	}
-};
+// 	if (res.type === 'success') {
+// 		return res.data;
+// 	} else {
+// 		return data;
+// 	}
+// };
 
 export const useTableStore = () => {
 	const dispatch = useAppDispatch();
@@ -50,10 +55,10 @@ export const useTableStore = () => {
 
 	const tableData = useAppSelector((state) => state.table);
 
-	console.log(tableData);
+	// console.log(tableData);
 
 	const {filters, showedFiltersOrder, sorting} = tableData;
-	const {executor, status, type} = filters;
+	// const {executor, status, type} = filters;
 	const filtersRef = useRef(filters);
 	filtersRef.current = filters;
 
@@ -65,74 +70,44 @@ export const useTableStore = () => {
 
 	const {
 		isLoading: getFilteredRowsIsLoading,
-		refetch,
+		fetchByQuery,
 		data,
 		error: getFilteredRowsError,
 		isSuccess: getFilteredRowsIsSuccess,
-	} = useQuery<unknown[], unknown, Parameters<typeof api.fetchFilteredRows>[0]>({
+	} = useNormalQuery<Parameters<typeof api.fetchFilteredRows>[0], ReturnType<typeof api.fetchFilteredRows>>({
 		// initialData: [],
-		queryKey: [fetchQuery],
-		queryFn: fetcher,
-		retryOnMount: false,
-		refetchOnMount: false,
-		refetchOnWindowFocus: false,
-		retry: 0,
-		// enabled: isAutoUpdate,
-		staleTime: 1000,
+		// disableAutoFetchByChangedQueryKey: true,
+		queryKey: fetchQuery,
+		queryFn: api.fetchFilteredRows,
+		fetchOnMount: false,
+		onSuccess: (data) => {
+			if (data.type === 'success') {
+				dispatch(setFilteredRows(data.data));
+			} else {
+				// return data;
+			}
+		},
+		onError: (error) => {
+			dispatch(setFilteredRows([]));
+		},
 	});
-
-	const [isRowsLoading, setIsRowsLoading] = useState(true);
 
 	const dataRef = useRef(data);
 	dataRef.current = data;
 
-	useEffect(() => {
-		if (getFilteredRowsIsLoading) {
-			setIsRowsLoading(true);
-		}
-	}, [getFilteredRowsIsLoading]);
-
 	const filteredRows = useAppSelector((state) => state.table.filteredRows);
-	useEffect(() => {
-		if (getFilteredRowsError) {
-			dispatch(setFilteredRows([]));
-		}
-	}, [getFilteredRowsError, setFilteredRows, dispatch]);
-
-	const fetchByFiltersForce = useCallback(async () => {
-		console.log('fetchQueryRef', fetchQueryRef.current);
-
-		await queryClient.invalidateQueries({
-			queryKey: [fetchQueryRef.current],
-			exact: true,
-			refetchType: 'all',
-			type: 'all',
-		});
-		let data = await queryClient.getQueryData([fetchQueryRef.current]);
-		console.log('data', data);
-		data = await queryClient.fetchQuery({queryKey: [fetchQueryRef.current], queryFn: fetcher});
-		console.log('data', data);
-		await refetch();
-	}, [queryClient, fetchQueryRef, refetch]);
-
-	// useEffect(() => {
-	// 	fetchByFilters();
-	// }, []);
 
 	useEffect(() => {
-		const newQuery = createQueryParamsFromFilter({filters, sorting});
+		const notEmptyFilters = {
+			...(filters?.executor?.length ? {executor: filters.executor} : {}),
+			...(filters?.status?.length ? {status: filters.status} : {}),
+			...(filters?.type?.length ? {type: filters.type} : {}),
+		};
+		const newQuery = createQueryParamsFromFilter({filters: notEmptyFilters, sorting});
+		console.log('newQuery', {notEmptyFilters, sorting});
+
 		setFetchQuery(newQuery);
 	}, [filters, sorting]);
-
-	useEffect(() => {
-		if (getFilteredRowsIsSuccess) {
-			dispatch(setFilteredRows(dataRef.current));
-		}
-	}, [getFilteredRowsIsSuccess, setFilteredRows, dispatch]);
-
-	useEffect(() => {
-		setIsRowsLoading(false);
-	}, [data]);
 
 	return {
 		data: {
@@ -153,9 +128,8 @@ export const useTableStore = () => {
 		showedFiltersOrder,
 		sorting,
 		getFilteredRowsError,
-		getFilteredRowsIsLoading: getFilteredRowsIsLoading || isRowsLoading,
-		fetchByFiltersForce,
-		fetchByFilters: () => refetch().catch(() => {}),
+		getFilteredRowsIsLoading: getFilteredRowsIsLoading, // || isRowsLoading,
+		fetchByFiltersForce: fetchByQuery,
 		filteredRows,
 		isAutoUpdate,
 		setIsAutoUpdate,

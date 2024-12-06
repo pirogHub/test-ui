@@ -61,13 +61,16 @@ function createData(
 	};
 }
 
-const labelDictionary: Record<keyof Data, string> = {
+const labelDictionary: Record<keyof Data, string> & {
+	rejectButton: string;
+} = {
 	id: 'ID',
 	appNumber: 'Номер заявки',
 	createdAt: 'Дата создания',
 	status: 'Статус',
 	type: 'Тип',
 	executor: 'Исполнитель',
+	rejectButton: '',
 };
 
 const dictionaryStatus = {
@@ -302,10 +305,12 @@ const HeaderCellRoot = styled('div', {
 	height: 100%;
 `;
 const HeaderCell: React.FC<{
+	notSorted?: boolean;
 	fieldName: string;
+	label: string;
 	onClick: (item: [string, 'desc' | 'asc' | undefined][]) => void;
 	direction?: 'asc' | 'desc';
-}> = ({fieldName, onClick: _onClick, direction}) => {
+}> = ({fieldName, label, notSorted, onClick: _onClick, direction}) => {
 	const [isHover, setIsHover] = React.useState(false);
 	let iconName = 'sortArrowsDown';
 	if (direction === 'asc') {
@@ -326,21 +331,24 @@ const HeaderCell: React.FC<{
 
 	return (
 		<HeaderCellRoot
-			onMouseOver={() => setIsHover(true)}
-			onMouseLeave={() => setIsHover(false)}
-			onClick={onClick}
-			className={isHover ? 'hover' : ''}
+			onMouseOver={!notSorted ? () => setIsHover(true) : undefined}
+			onMouseLeave={!notSorted ? () => setIsHover(false) : undefined}
+			// onClick={!notSorted ? onClick : undefined}
+			onClick={!notSorted ? onClick : undefined}
+			className={!notSorted ? (isHover ? 'hover' : '') : ''}
 		>
-			{fieldName}
-			<Icon2
-				isNotIcon
-				sx={{
-					opacity: direction ? 1 : isHover ? 0.5 : 0,
-				}}
-				color="icon2"
-				size={18}
-				url={getIconUrlByName(iconName)}
-			/>
+			{label}
+			{!notSorted && (
+				<Icon2
+					isNotIcon
+					sx={{
+						opacity: direction ? 1 : isHover ? 0.5 : 0,
+					}}
+					color="icon2"
+					size={18}
+					url={getIconUrlByName(iconName)}
+				/>
+			)}
 		</HeaderCellRoot>
 	);
 };
@@ -393,6 +401,10 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 			'&:hover': {
 				backgroundColor: colors.base5,
 			},
+
+			'&.MuiDataGrid-row--lastVisible': {
+				borderBottom: '1px solid var(--rowBorderColor)',
+			},
 		},
 		'& .MuiDataGrid-cell': {
 			'&:has(.MuiSkeleton-root)': {
@@ -436,16 +448,30 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 	};
 });
 
+const getEmptyRows = (count: number) => {
+	const emptyRow = createData(999, null, '', '', '', '');
+
+	return new Array(count).fill(null).map((_, i) => {
+		return {...emptyRow, id: emptyRow.id + i};
+	});
+};
+
 const ColumnAutosizing = () => {
 	const apiRef = useGridApiRef();
 	// const data = useData(100);
 
 	const {tableStore} = useCustomStore();
-	const {filteredRows, fetchByFiltersForce, getFilteredRowsIsLoading, sorting, setSorting} = tableStore;
+	const {filteredRows, getFilteredRowsIsLoading, sorting, setSorting} = tableStore;
 
-	React.useEffect(() => {
-		fetchByFiltersForce();
-	}, []);
+	const sizablefilteredRows = React.useMemo(() => {
+		const isNeed = filteredRows.length < 5;
+		console.log('isNeed', isNeed, 'filteredRows', filteredRows.length);
+		const res = isNeed ? [...filteredRows, ...getEmptyRows(5 - (filteredRows.length || 0))] : filteredRows;
+		return res;
+	}, [filteredRows]);
+	// React.useEffect(() => {
+	// 	fetchByFiltersForce();
+	// }, []);
 
 	React.useEffect(() => {
 		if (!apiRef.current) {
@@ -454,6 +480,13 @@ const ColumnAutosizing = () => {
 
 		apiRef.current.autosizeColumns({expand: true}).catch(() => {});
 	}, [apiRef]);
+
+	const headerKeys = React.useMemo(() => {
+		if (getFilteredRowsIsLoading || !filteredRows || !filteredRows?.length || !filteredRows[0]) {
+			return [];
+		}
+		return Object.keys(filteredRows?.[0]);
+	}, [filteredRows, getFilteredRowsIsLoading]);
 
 	const [isWithReject, setIsWithReject] = React.useState(true);
 	const columns = React.useMemo(() => {
@@ -477,6 +510,9 @@ const ColumnAutosizing = () => {
 		return keys
 			.filter((key) => key !== 'id')
 			.map((key) => {
+				console.log(key);
+				let label = labelDictionary?.[key] as string | undefined;
+				label = label !== undefined ? label : key;
 				const item: DataGridProps['columns'][0] = {
 					resizable: key !== 'rejectButton',
 					// sortable: key !== 'rejectButton',
@@ -487,19 +523,19 @@ const ColumnAutosizing = () => {
 					renderHeader: (params) => {
 						const field = params.field;
 						const direction = sorting ? sorting?.find((item) => item[0] === field) : [];
-						return <HeaderCell onClick={setSorting} fieldName={field} direction={direction?.[1]} />;
-						// <div style={{display: 'flex', gap: '5px', justifyContent: 'center', alignItems: 'center'}}>
-						// 	{params.field}
-						// 	{direction?.[1] === 'asc' ? (
-						// 		<Icon2 color="icon2" size={16} url={getIconUrlByName('sortArrowsUp')} />
-						// 	) : (
-						// 		<Icon2 color="icon2" size={16} url={getIconUrlByName('sortArrowsDown')} />
-						// 	)}
-						// </div>
-						// );
+
+						return (
+							<HeaderCell
+								notSorted={key === 'rejectButton'}
+								onClick={setSorting}
+								fieldName={key}
+								label={label}
+								direction={direction?.[1]}
+							/>
+						);
 					},
 					field: key,
-					headerName: labelDictionary[key as keyof Data],
+					// headerName: labelDictionary[key as keyof Data],
 				};
 				return item;
 			});
@@ -582,7 +618,7 @@ const ColumnAutosizing = () => {
 					// 	{id: '2', key: 'skeleton'},
 					// ]}
 					loading={getFilteredRowsIsLoading}
-					rows={getFilteredRowsIsLoading ? LoadingSkeletons : filteredRows}
+					rows={getFilteredRowsIsLoading ? LoadingSkeletons : sizablefilteredRows}
 					// rows={LoadingSkeletons}
 					initialState={{
 						pagination: {paginationModel: {pageSize: 5}},

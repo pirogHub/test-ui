@@ -101,7 +101,8 @@ const FiltersVariants = () => {
 					[filterKey]: false,
 				};
 			});
-			fetchByFiltersForce();
+			// fetchByFiltersForce();
+			fetchByFiltersForce(true).catch(console.error);
 		},
 		[setFiltersListShowed, fetchByFiltersForce],
 	);
@@ -225,6 +226,12 @@ const FiltersVariants = () => {
 
 				<div>
 					<FilterItem
+						sxButton={{
+							width: '40px',
+							height: '40px',
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}
 						closeWhenSelect
 						filterKey="add-filters"
 						hideIfEmptyList
@@ -252,7 +259,7 @@ const FiltersVariants = () => {
 						)}
 					/>
 				</div>
-				<CustomFader withoutHeightCollapse timeout={200} className={`${isShowClearAll ? '' : 'hide'}`}>
+				<CustomFader withoutHeightCollapse timeout={300} className={`${isShowClearAll ? '' : 'hide'}`}>
 					<ButtonStyled
 						size="m"
 						view="flatted"
@@ -262,7 +269,6 @@ const FiltersVariants = () => {
 				</CustomFader>
 			</div>
 			<div style={{paddingBlock: '20px'}}>
-				<ButtonStyled size="m" view="flatted" onClick={fetchByFiltersForce} label="фктч" />
 				<CreateProposal />
 			</div>
 		</div>

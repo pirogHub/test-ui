@@ -10,6 +10,7 @@ const Layout = ({children}: {children: React.ReactNode}) => {
 	// todo
 	return (
 		<div
+			className="main-layout"
 			style={{
 				padding: '24px 48px',
 			}}

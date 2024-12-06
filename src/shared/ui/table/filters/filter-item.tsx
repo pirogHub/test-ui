@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {CircularProgress, Popover} from '@mui/material';
+import {CircularProgress, Popover, SxProps} from '@mui/material';
 
 import {InputField} from '../../input';
 import {
@@ -24,6 +24,7 @@ type BaseItemType = {
 };
 
 type FiltersProps<T extends BaseItemType> = {
+	sxButton?: SxProps;
 	initialState?: Record<T['key'], boolean>;
 	onDropFilters?: () => void;
 	onSubmitFilters?: (data: Partial<Record<T['key'], boolean>>) => void;
@@ -60,6 +61,7 @@ const getSelectedKeysFromObject = (data: Record<string, boolean | undefined> | u
 };
 
 export const FilterItem = <T extends BaseItemType>({
+	sxButton,
 	onClickOneElem,
 	openWhenCreate,
 	closeWhenSelect,
@@ -237,7 +239,7 @@ export const FilterItem = <T extends BaseItemType>({
 
 	return (
 		<div>
-			<FilterButton ref={anchorElRef} onClick={handleClick}>
+			<FilterButton sx={sxButton} ref={anchorElRef} onClick={handleClick}>
 				<div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
 					{filterIconComponent}
 					{Boolean(label) && <label>{label}</label>}

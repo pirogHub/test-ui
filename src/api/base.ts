@@ -45,8 +45,10 @@ export const api = {
 	},
 
 	fetchFilteredRows: async (query: string): Promise<{type: 'success'; data: any} | {type: 'error'; data: any}> => {
+		console.log('fetchFilteredRows');
+
 		try {
-			console.log('query', query);
+			// console.log('query', query);
 
 			// const response = await axios.get<any[]>('/api/fetch-filtered-rows' + query);
 			const response = await axios.get<any[]>('/api/fetch-filtered-rows?' + query);
