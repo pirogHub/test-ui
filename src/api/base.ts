@@ -44,14 +44,16 @@ export const api = {
 		return response.data;
 	},
 
-	fetchFilteredRows: async (query: string): Promise<{type: 'success'; data: any} | {type: 'error'; data: any}> => {
+	fetchFilteredRows: async (
+		query: string,
+	): Promise<{type: 'success'; data: unknown} | {type: 'error'; data: unknown}> => {
 		console.log('fetchFilteredRows');
 
 		try {
 			// console.log('query', query);
 
 			// const response = await axios.get<any[]>('/api/fetch-filtered-rows' + query);
-			const response = await axios.get<any[]>('/api/fetch-filtered-rows?' + query);
+			const response = await axios.get<unknown[]>('/api/fetch-filtered-rows?' + query);
 
 			if (response.status !== 200) {
 				throw new Error('user error');
@@ -63,7 +65,7 @@ export const api = {
 			return {type: 'error', data: error};
 		}
 	},
-	fetchExecutors: async (): Promise<{type: 'success'; data: string[]} | {type: 'error'; data: any}> => {
+	fetchExecutors: async (): Promise<{type: 'success'; data: string[]} | {type: 'error'; data: unknown}> => {
 		try {
 			// const response = await axios.get<any[]>('/api/fetch-filtered-rows' + query);
 			const response = await axios.get<string[]>('/api/fetch-executors');

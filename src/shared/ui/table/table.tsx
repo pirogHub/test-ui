@@ -27,7 +27,7 @@ import {
 } from '@mui/x-data-grid';
 import {useRouter} from 'next/router';
 
-import {getIconUrlByName} from '@/shared/icons/icons-data';
+import {MyIconName, getIconUrlByName} from '@/shared/icons/icons-data';
 import {useCustomStore} from '@/shared/providers/store-provider';
 
 import {Icon2} from '../icon';
@@ -36,7 +36,7 @@ import Filters from './filters/filters';
 
 interface Data {
 	id: number;
-	createdAt: number;
+	createdAt: number | null;
 	appNumber: string;
 	status: StatusTypes;
 	type: string;
@@ -45,7 +45,7 @@ interface Data {
 
 function createData(
 	id: number,
-	createdAt: number,
+	createdAt: number | null,
 	appNumber: string,
 	status: StatusTypes,
 	type: string,
@@ -134,6 +134,7 @@ const CustomizeCellContent: (
 				content = <StatusBadge status={value as StatusTypes} />;
 				break;
 			case 'type':
+				// @ts-expect-error toremove
 				content = <div>{dictionaryStatus[value] || value}</div>;
 				break;
 			case 'executor':
@@ -312,7 +313,7 @@ const HeaderCell: React.FC<{
 	direction?: 'asc' | 'desc';
 }> = ({fieldName, label, notSorted, onClick: _onClick, direction}) => {
 	const [isHover, setIsHover] = React.useState(false);
-	let iconName = 'sortArrowsDown';
+	let iconName: MyIconName = 'sortArrowsDown';
 	if (direction === 'asc') {
 		iconName = 'sortArrowsDown';
 	} else if (direction === 'desc') {
@@ -449,6 +450,7 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 });
 
 const getEmptyRows = (count: number) => {
+	// @ts-expect-error toremove
 	const emptyRow = createData(999, null, '', '', '', '');
 
 	return new Array(count).fill(null).map((_, i) => {
@@ -511,6 +513,7 @@ const ColumnAutosizing = () => {
 			.filter((key) => key !== 'id')
 			.map((key) => {
 				console.log(key);
+				// @ts-expect-error toremove
 				let label = labelDictionary?.[key] as string | undefined;
 				label = label !== undefined ? label : key;
 				const item: DataGridProps['columns'][0] = {
@@ -608,7 +611,7 @@ const ColumnAutosizing = () => {
 						},
 						row: {
 							style: {
-								'--height': '51px',
+								// '--height': '51px',
 							},
 						},
 					}}
@@ -618,6 +621,7 @@ const ColumnAutosizing = () => {
 					// 	{id: '2', key: 'skeleton'},
 					// ]}
 					loading={getFilteredRowsIsLoading}
+					// @ts-expect-error toremove
 					rows={getFilteredRowsIsLoading ? LoadingSkeletons : sizablefilteredRows}
 					// rows={LoadingSkeletons}
 					initialState={{

@@ -265,6 +265,7 @@ export const FilterItem = <T extends BaseItemType>({
 				id={id}
 				open={Boolean(anchorEl) && isOpen}
 				// anchorEl={anchorEl}
+				// @ts-expect-error toremove
 				anchorEl={() => anchorElRef.current || null}
 				onClose={handleClose}
 				onClick={onPopoverClick}

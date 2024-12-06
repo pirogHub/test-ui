@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import {User} from '@/state/types';
 import {DataGridProps} from '@mui/x-data-grid';
 import type {NextApiRequest, NextApiResponse} from 'next';
 
@@ -26,7 +32,9 @@ const descendingComparator: DataGridProps['columns'][0]['sortComparator'] = (a, 
 		let translateA = a;
 		let translateB = b;
 		if (cell1.field === 'status' || cell1.field === 'type') {
+			// @ts-expect-error toremove
 			translateA = dicts[cell1.field][a] || '';
+			// @ts-expect-error toremove
 			translateB = dicts[cell1.field][b] || '';
 		}
 
@@ -68,11 +76,10 @@ const rows: Data[] = [
 	createData(10, 1704473214000, 'APP010', 'done', 'outer', 'Николай Николаев'),
 ];
 
-let i = 0;
-
 export default function handler(req: NextApiRequest, res: NextApiResponse<Data[]>) {
 	const params = req.query;
 
+	// @ts-expect-error toremove
 	const parsedParams = Object.fromEntries(Object.entries(params).map(([key, value]) => [key, JSON.parse(value)]));
 
 	const filters = parsedParams.filters;
@@ -87,7 +94,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data[]
 		console.log('filterKeys', filterKeys);
 
 		const notEmptyFilterArr = Object.entries(filters).reduce((acc, [key, val]) => {
+			// @ts-expect-error toremove
 			if (val && val?.length) {
+				// @ts-expect-error toremove
 				acc.push([key, val]);
 			}
 			return acc;
@@ -96,13 +105,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data[]
 		if (notEmptyFilterArr.length) {
 			data = rows.filter((row) => {
 				let isEnabled = true;
-
+				// @ts-expect-error toremove
 				notEmptyFilterArr?.forEach(([key, val]) => {
 					if (Object.hasOwn(row, key)) {
 						switch (key) {
 							case 'status':
 							case 'type':
 							case 'executor':
+								// @ts-expect-error toremove
 								if (!val.includes(row[key])) isEnabled = false;
 								break;
 							default:
@@ -119,13 +129,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data[]
 	if (sorting && sorting?.[0]?.[0] && sorting?.[0]?.[1]) {
 		const field = sorting[0][0];
 		const direction = sorting[0][1];
-
+		// @ts-expect-error toremove
 		const isSafeSort = data[0]?.[field];
 		console.log(field, direction, isSafeSort);
 		if (isSafeSort) {
 			console.log('start sorting');
 
 			data = [...data].sort((a, b) => {
+				// @ts-expect-error toremove
 				return descendingComparator(a[field], b[field], {field}, b);
 			});
 

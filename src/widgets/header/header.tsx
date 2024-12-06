@@ -93,10 +93,13 @@ const Header = styled('header')`
 export const SkyHeader = () => {
 	const {userStore} = useCustomStore();
 
-	const {user, refetch, logout} = userStore;
+	const {
+		user,
+		// refetch, logout
+	} = userStore;
 
 	useEffect(() => {
-		console.log('user', user);
+		// console.log('user', user);
 	}, [user]);
 
 	const {toggleTheme, isDarkMode} = useThemeToggle();

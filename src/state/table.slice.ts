@@ -1,4 +1,4 @@
-import {PayloadAction, configureStore, createSlice} from '@reduxjs/toolkit';
+import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {z} from 'zod';
 
 import {StatusTypes} from '@/shared/ui/status-badge/badge-status';
@@ -7,30 +7,34 @@ const StatusTypesSchema = z.enum(['analyze', 'in-work', 'done', 'specified', 're
 
 const TypesSChema = z.enum(['inner', 'outer']);
 
-function deepMerge(target: any, source: any, depth: number = 5): any {
-	if (depth === 0 || typeof target !== 'object' || typeof source !== 'object') {
+function deepMerge(target: unknown, source: unknown, depth: number = 5): unknown {
+	if (depth === 0 || !source || !target || typeof target !== 'object' || typeof source !== 'object') {
 		return target || source; // На максимальной глубине перезаписываем значение
 	}
 
-	console.log('----');
+	// console.log('----');
 
-	console.log(`- ${5 - depth} SOURCE`, source);
+	// console.log(`- ${5 - depth} SOURCE`, source);
 	const isArray = Array.isArray(target);
 
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const result = isArray ? [...target] : {};
-	console.log(`- ${5 - depth} target RESULT`, result);
-	console.log('TARGET', isArray, target);
+	// console.log(`- ${5 - depth} target RESULT`, result);
+	// console.log('TARGET', isArray, target);
 
 	for (const key of Object.keys(source)) {
-		console.log(`- ${5 - depth} key`, key, 'SOURCE', source);
+		// console.log(`- ${5 - depth} key`, key, 'SOURCE', source);
 
 		if (key in target) {
+			// @ts-expect-error toremove
 			result[key] = deepMerge(target[key], source[key], depth - 1);
 		} else {
+			// @ts-expect-error toremove
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			result[key] = source[key];
 		}
 	}
-	console.log(`- ${5 - depth} RESULT`, result);
+	// console.log(`- ${5 - depth} RESULT`, result);
 
 	return result;
 }
@@ -77,10 +81,10 @@ function deepMerge(target: any, source: any, depth: number = 5): any {
 // 	return result;
 // }
 
-type DateRange = {
-	start: Date | null;
-	end: Date | null;
-};
+// type DateRange = {
+// 	start: Date | null;
+// 	end: Date | null;
+// };
 
 type FiltersState = {
 	filters: {
@@ -123,7 +127,7 @@ const tableSlice = createSlice({
 	initialState,
 	reducers: {
 		setStatus: (state, action: PayloadAction<FiltersState['filters']['status']>) => {
-			console.log('redux set status');
+			// console.log('redux set status');
 
 			state.filters.status = action.payload;
 		},
@@ -145,10 +149,10 @@ const tableSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder.addCase('persist/REHYDRATE', (state, action) => {
-			console.log('persist/REHYDRATE');
+			// console.log('persist/REHYDRATE');
 			const typedAction = action as PayloadAction<{table: FiltersState}>;
 			const incomingState = typedAction.payload?.table || {};
-			console.log('start', initialState);
+			// console.log('start', initialState);
 
 			const result = deepMerge(incomingState, initialState, 5) as FiltersState;
 

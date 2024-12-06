@@ -10,6 +10,7 @@ import {Icon2} from '../icon/icon';
 
 const RowsWrapper = styled('div', {
 	label: 'rows-wrapper',
+	// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 })<{}>`
 	display: flex;
 	flex-direction: column;

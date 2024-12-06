@@ -1,7 +1,6 @@
-import {use, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {api} from '@/api/base';
-import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {bindActionCreators} from 'redux';
 
 import {useNormalQuery} from '@/shared/hooks/use-normal-query';
@@ -49,9 +48,9 @@ export const useTableStore = () => {
 
 	const {setFilteredRows} = handlers;
 
-	const queryClient = useQueryClient();
+	// const queryClient = useQueryClient();
 
-	const queryKey = ['table-filtered-rows'];
+	// const queryKey = ['table-filtered-rows'];
 
 	const tableData = useAppSelector((state) => state.table);
 
@@ -82,12 +81,14 @@ export const useTableStore = () => {
 		fetchOnMount: false,
 		onSuccess: (data) => {
 			if (data.type === 'success') {
+				// @ts-expect-error toremoveq
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				dispatch(setFilteredRows(data.data));
 			} else {
 				// return data;
 			}
 		},
-		onError: (error) => {
+		onError: () => {
 			dispatch(setFilteredRows([]));
 		},
 	});
@@ -104,7 +105,7 @@ export const useTableStore = () => {
 			...(filters?.type?.length ? {type: filters.type} : {}),
 		};
 		const newQuery = createQueryParamsFromFilter({filters: notEmptyFilters, sorting});
-		console.log('newQuery', {notEmptyFilters, sorting});
+		// console.log('newQuery', {notEmptyFilters, sorting});
 
 		setFetchQuery(newQuery);
 	}, [filters, sorting]);
