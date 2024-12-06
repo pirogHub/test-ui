@@ -77,7 +77,7 @@ const dictionaryStatus = {
 
 const labelDictionaryReversed = Object.fromEntries(Object.entries(labelDictionary).map(([key, value]) => [value, key]));
 
-const LoadingSkeletons = Array.from({length: 3}).map((_, index) => ({
+const LoadingSkeletons = Array.from({length: 5}).map((_, index) => ({
 	id: index,
 	skeleton: (
 		<Skeleton key={index} sx={{width: '100%', height: '100%', bgcolor: '#eee'}} variant="rectangular" height={50} />
@@ -148,14 +148,14 @@ const CustomizeCellContent: (
 	return content;
 };
 
-const descendingComparator: DataGridProps['columns'][0]['sortComparator'] = (a, b, cell1, cell2) => {
-	// console.log(a, b, cell1, cell2);
-	if (cell1.field === 'status' || typeof a === 'string') {
-		return -1 * (a as string).localeCompare(b as string);
-	}
+// const descendingComparator: DataGridProps['columns'][0]['sortComparator'] = (a, b, cell1, cell2) => {
+// 	// console.log(a, b, cell1, cell2);
+// 	if (cell1.field === 'status' || typeof a === 'string') {
+// 		return -1 * (a as string).localeCompare(b as string);
+// 	}
 
-	return a - b > 0 ? -1 : 1;
-};
+// 	return a - b > 0 ? -1 : 1;
+// };
 const TablePaginationSelect = styled(Select, {
 	name: 'MuiTablePagination',
 	slot: 'Select',
@@ -291,6 +291,60 @@ const CustomFooterStatusComponent = (
 	);
 };
 
+const HeaderCellRoot = styled('div', {
+	shouldForwardProp: (prop) => prop !== 'hover',
+})<{hover?: boolean}>`
+	display: flex;
+	gap: 5px;
+	justify-content: start;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+`;
+const HeaderCell: React.FC<{
+	fieldName: string;
+	onClick: (item: [string, 'desc' | 'asc' | undefined][]) => void;
+	direction?: 'asc' | 'desc';
+}> = ({fieldName, onClick: _onClick, direction}) => {
+	const [isHover, setIsHover] = React.useState(false);
+	let iconName = 'sortArrowsDown';
+	if (direction === 'asc') {
+		iconName = 'sortArrowsDown';
+	} else if (direction === 'desc') {
+		iconName = 'sortArrowsUp';
+	}
+
+	const onClick = () => {
+		if (direction === 'asc') {
+			_onClick([[fieldName, 'desc']]);
+		} else if (direction === 'desc') {
+			_onClick([[fieldName, undefined]]);
+		} else {
+			_onClick([[fieldName, 'asc']]);
+		}
+	};
+
+	return (
+		<HeaderCellRoot
+			onMouseOver={() => setIsHover(true)}
+			onMouseLeave={() => setIsHover(false)}
+			onClick={onClick}
+			className={isHover ? 'hover' : ''}
+		>
+			{fieldName}
+			<Icon2
+				isNotIcon
+				sx={{
+					opacity: direction ? 1 : isHover ? 0.5 : 0,
+				}}
+				color="icon2"
+				size={18}
+				url={getIconUrlByName(iconName)}
+			/>
+		</HeaderCellRoot>
+	);
+};
+
 const StyledDataGrid = styled(DataGrid)(({theme}) => {
 	const colors = (theme as skyAllianceMUITheme).colors;
 	return {
@@ -315,8 +369,13 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 			color: colors.icon2,
 			fontWeight: 600,
 			fontSize: 15,
+			cursor: 'pointer',
 
 			border: 'none!important',
+			transition: 'all 0.4s ease',
+		},
+		'& .MuiDataGrid-columnHeader:hover': {
+			backgroundColor: colors.base4,
 		},
 		'& .MuiDataGrid-row--borderBottom ': {
 			border: 'none',
@@ -364,7 +423,15 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 			lineHeight: '18px',
 		},
 		'& .MuiDataGrid-columnHeaderTitleContainer': {
-			gap: 3,
+			justifyContent: 'stretch',
+			alignItems: 'stretch',
+			flex: 1,
+		},
+
+		'& .MuiDataGrid-columnHeaderTitleContainerContent': {
+			justifyContent: 'stretch',
+			alignItems: 'stretch',
+			flex: 1,
 		},
 	};
 });
@@ -374,7 +441,7 @@ const ColumnAutosizing = () => {
 	// const data = useData(100);
 
 	const {tableStore} = useCustomStore();
-	const {filteredRows, fetchByFiltersForce, getFilteredRowsIsLoading} = tableStore;
+	const {filteredRows, fetchByFiltersForce, getFilteredRowsIsLoading, sorting, setSorting} = tableStore;
 
 	React.useEffect(() => {
 		fetchByFiltersForce();
@@ -412,17 +479,31 @@ const ColumnAutosizing = () => {
 			.map((key) => {
 				const item: DataGridProps['columns'][0] = {
 					resizable: key !== 'rejectButton',
-					sortable: key !== 'rejectButton',
+					// sortable: key !== 'rejectButton',
+					sortable: false,
 					flex: 1,
-					sortComparator: descendingComparator,
+					// sortComparator: descendingComparator,
 					renderCell: CustomizeCellContent,
-					// renderHeader: CustomizeCellContent,
+					renderHeader: (params) => {
+						const field = params.field;
+						const direction = sorting ? sorting?.find((item) => item[0] === field) : [];
+						return <HeaderCell onClick={setSorting} fieldName={field} direction={direction?.[1]} />;
+						// <div style={{display: 'flex', gap: '5px', justifyContent: 'center', alignItems: 'center'}}>
+						// 	{params.field}
+						// 	{direction?.[1] === 'asc' ? (
+						// 		<Icon2 color="icon2" size={16} url={getIconUrlByName('sortArrowsUp')} />
+						// 	) : (
+						// 		<Icon2 color="icon2" size={16} url={getIconUrlByName('sortArrowsDown')} />
+						// 	)}
+						// </div>
+						// );
+					},
 					field: key,
 					headerName: labelDictionary[key as keyof Data],
 				};
 				return item;
 			});
-	}, [filteredRows, getFilteredRowsIsLoading, isWithReject]);
+	}, [filteredRows, sorting, getFilteredRowsIsLoading, isWithReject]);
 
 	const router = useRouter();
 

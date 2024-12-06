@@ -53,7 +53,7 @@ const allFiltersNamesList = Object.keys(FiltersDataToShow) as FiltersType[];
 
 const FiltersVariants = () => {
 	const {tableStore} = useCustomStore();
-	const {fetchByFiltersForce, data: tableData, setters} = tableStore;
+	const {fetchByFiltersForce, data: tableData, setters, showedFiltersOrder} = tableStore;
 
 	const {status: selectedStatuses, type: selectedAppTypes, executor: selectedExecutors} = tableData;
 
@@ -62,6 +62,14 @@ const FiltersVariants = () => {
 
 	const [clearAllFlag, setClearAllFlag] = React.useState(false);
 
+	// const [filtersListShowed, setFiltersListShowed] = React.useState<Partial<Record<T['key'], boolean>>>(
+	// 	showedFiltersOrder.reduce((acc, item) => {
+	// 		return {
+	// 			...acc,
+	// 			[item]: true,
+	// 		};
+	// 	}, {}),
+	// );
 	const [filtersListShowed, setFiltersListShowed] = React.useState<Partial<Record<T['key'], boolean>>>(
 		Object.keys(tableData)?.reduce((acc, item) => {
 			return {
@@ -173,12 +181,27 @@ const FiltersVariants = () => {
 		return result;
 	}, [filtersListShowed2, executorsList, isExecutorPending, isExecutorPendingError]);
 
+	// const [isOnFirstMount, setIsOnFirstMount] = React.useState(true);
+
+	const [controlShowWhenCreate, setControlShowWhenCreate] = React.useState<string>('');
+
+	const onClickOneElem = (name: string, isSelected: boolean) => {
+		if (isSelected) {
+			setControlShowWhenCreate(isSelected ? name : '');
+		}
+	};
+
+	useEffect(() => {
+		filtersListShowed2.forEach((item) => {});
+	}, [filtersListShowed2]);
+
 	return (
 		<div style={{display: 'flex', justifyContent: 'space-between'}}>
 			<div style={{display: 'flex', gap: '8px', paddingBlock: '20px'}}>
 				{filtersList.map((it) => {
 					return (
 						<FilterItem
+							openWhenCreate={controlShowWhenCreate === it.key}
 							initialState={it.initialState}
 							filterKey={it.key}
 							key={it.key}
@@ -202,6 +225,7 @@ const FiltersVariants = () => {
 
 				<div>
 					<FilterItem
+						closeWhenSelect
 						filterKey="add-filters"
 						hideIfEmptyList
 						withoutChest
@@ -213,6 +237,7 @@ const FiltersVariants = () => {
 						controlledSelectedData={filtersListShowed}
 						filterIconComponent={<Icon2 color="icon2" size={20} url={getIconUrlByName('filterAdd')} />}
 						onSetData={setFiltersListShowed2}
+						onClickOneElem={onClickOneElem}
 						dataToShow={filtersListNotShowed}
 						renderItem={(item) => (
 							<div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>

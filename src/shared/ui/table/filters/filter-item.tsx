@@ -47,6 +47,9 @@ type FiltersProps<T extends BaseItemType> = {
 	clearFilterFlag?: boolean;
 	isDataLoading?: boolean;
 	errorDataLoading?: string;
+	closeWhenSelect?: boolean;
+	openWhenCreate?: boolean;
+	onClickOneElem?: (name: T['key'], isSelected: boolean) => void;
 };
 
 const getSelectedKeysFromObject = (data: Record<string, boolean | undefined> | undefined) => {
@@ -57,6 +60,9 @@ const getSelectedKeysFromObject = (data: Record<string, boolean | undefined> | u
 };
 
 export const FilterItem = <T extends BaseItemType>({
+	onClickOneElem,
+	openWhenCreate,
+	closeWhenSelect,
 	isDataLoading,
 	errorDataLoading,
 	initialState,
@@ -98,15 +104,27 @@ export const FilterItem = <T extends BaseItemType>({
 		checkedData ? Object.values(checkedData).filter(Boolean).length : 0,
 	);
 
-	const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+	// const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+	const [isOpen, setIsOpen] = React.useState(false);
+	const anchorElRef = React.useRef<HTMLButtonElement | null>(null);
+	const anchorEl = anchorElRef.current;
 
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-		setAnchorEl(event.currentTarget);
+	useEffect(() => {
+		if (openWhenCreate && anchorElRef.current) {
+			handleClick();
+		}
+	}, [openWhenCreate, anchorElRef]);
+
+	// const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleClick = () => {
+		// setAnchorEl(event.currentTarget);
+		setIsOpen(true);
 	};
+
 	const handleClose = () => {
-		setAnchorEl(null);
+		setIsOpen(false);
 	};
-	const isOpen = Boolean(anchorEl);
+	// const isOpen = Boolean(anchorEl);
 	const id = 'simple-popover';
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isSelectedAll, setIsSelectedAll] = useState(false);
@@ -187,7 +205,8 @@ export const FilterItem = <T extends BaseItemType>({
 
 	useEffect(() => {
 		if (!filteredDataList?.length && hideIfEmptyList) {
-			setAnchorEl(null);
+			// setAnchorEl(null);
+			setIsOpen(false);
 		}
 	}, [filteredDataList, hideIfEmptyList]);
 
@@ -196,6 +215,9 @@ export const FilterItem = <T extends BaseItemType>({
 
 		const itemId = target.closest('[data-item-id]')?.getAttribute('data-item-id') as T['key']; //(T[0]['key'];
 		if (itemId) {
+			if (onClickOneElem) {
+				onClickOneElem(itemId, !checkedDataRef.current[itemId]);
+			}
 			setCheckedData((prev) => {
 				if (!prev) return {[itemId]: true} as Partial<Record<T['key'], boolean>>;
 
@@ -204,6 +226,10 @@ export const FilterItem = <T extends BaseItemType>({
 					[itemId]: !prev?.[itemId],
 				} as Partial<Record<T['key'], boolean>>;
 			});
+			if (closeWhenSelect) {
+				setIsOpen(false);
+				// setAnchorEl(null);
+			}
 		}
 	};
 
@@ -211,7 +237,7 @@ export const FilterItem = <T extends BaseItemType>({
 
 	return (
 		<div>
-			<FilterButton onClick={handleClick}>
+			<FilterButton ref={anchorElRef} onClick={handleClick}>
 				<div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
 					{filterIconComponent}
 					{Boolean(label) && <label>{label}</label>}
@@ -235,11 +261,15 @@ export const FilterItem = <T extends BaseItemType>({
 			</FilterButton>
 			<Popover
 				id={id}
-				open={isOpen}
-				anchorEl={anchorEl}
+				open={Boolean(anchorEl) && isOpen}
+				// anchorEl={anchorEl}
+				anchorEl={() => anchorElRef.current || null}
 				onClose={handleClose}
 				onClick={onPopoverClick}
 				anchorOrigin={popoverAnchorOrigin}
+				sx={{
+					marginTop: '5px',
+				}}
 			>
 				{Boolean(filterFunction) && (
 					<InputField

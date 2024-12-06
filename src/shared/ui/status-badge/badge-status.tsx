@@ -8,7 +8,8 @@ export const StatusTypesVals = ['analyze', 'in-work', 'done', 'specified', 'reje
 // export type StatusTypes = 'analyze' | 'in-work' | 'done' | 'specified' | 'rejected' | 'waited' | 'draft';
 export type StatusTypes = (typeof StatusTypesVals)[number];
 
-const StatusDataMap: Record<
+export const StatusDataMap: Record<
+	// TODO вынести
 	StatusTypes,
 	{
 		color: SkyAllianceBaseColorsNamesType;

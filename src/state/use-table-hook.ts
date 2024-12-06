@@ -52,7 +52,7 @@ export const useTableStore = () => {
 
 	console.log(tableData);
 
-	const {filters} = tableData;
+	const {filters, showedFiltersOrder, sorting} = tableData;
 	const {executor, status, type} = filters;
 	const filtersRef = useRef(filters);
 	filtersRef.current = filters;
@@ -120,9 +120,9 @@ export const useTableStore = () => {
 	// }, []);
 
 	useEffect(() => {
-		const newQuery = createQueryParamsFromFilter(filters);
+		const newQuery = createQueryParamsFromFilter({filters, sorting});
 		setFetchQuery(newQuery);
-	}, [executor, status, type]);
+	}, [filters, sorting]);
 
 	useEffect(() => {
 		if (getFilteredRowsIsSuccess) {
@@ -148,7 +148,10 @@ export const useTableStore = () => {
 			}),
 			[handlers],
 		),
+		setSorting: handlers.setSorting,
 
+		showedFiltersOrder,
+		sorting,
 		getFilteredRowsError,
 		getFilteredRowsIsLoading: getFilteredRowsIsLoading || isRowsLoading,
 		fetchByFiltersForce,

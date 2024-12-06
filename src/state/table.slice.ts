@@ -1,6 +1,11 @@
 import {PayloadAction, configureStore, createSlice} from '@reduxjs/toolkit';
+import {z} from 'zod';
 
 import {StatusTypes} from '@/shared/ui/status-badge/badge-status';
+
+const StatusTypesSchema = z.enum(['analyze', 'in-work', 'done', 'specified', 'rejected', 'waited', 'draft']);
+
+const TypesSChema = z.enum(['inner', 'outer']);
 
 function deepMerge(target: any, source: any, depth: number = 5): any {
 	if (depth === 0 || typeof target !== 'object' || typeof source !== 'object') {
@@ -83,17 +88,32 @@ type FiltersState = {
 		status: StatusTypes[]; // Можно уточнить типы, если известно больше вариантов
 		executor: string[];
 	};
+	sorting?: [string, 'asc' | 'desc' | undefined][]; // TODO
+	validators?: {
+		type?: (i: string) => boolean;
+		status?: (i: StatusTypes) => boolean;
+		executor?: (i: string) => boolean;
+		sorting?: (i: string) => boolean;
+	};
+	showedFiltersOrder: FiltersNamesType[];
 	filteredRows: unknown[]; // TODO
 };
 
+type FiltersNamesType = keyof FiltersState['filters'];
+
 const initialState: FiltersState = {
-	// search: '',
 	filters: {
 		status: [],
 		type: [],
-		// dateRange: {start: null, end: null},
 		executor: [],
 	},
+	sorting: [],
+	validators: {
+		type: (i) => TypesSChema.safeParse(i).success,
+		status: (i) => StatusTypesSchema.safeParse(i).success,
+		// executor?: (i) => ;
+	},
+	showedFiltersOrder: [],
 	filteredRows: [],
 };
 
@@ -116,15 +136,39 @@ const tableSlice = createSlice({
 		setFilteredRows: (state, action: PayloadAction<FiltersState['filteredRows']>) => {
 			state.filteredRows = action.payload;
 		},
+		setSorting: (state, action: PayloadAction<FiltersState['sorting']>) => {
+			// action.payload?.forEach(([fieldName, direction ]) => {
+			// 	const
+			// })
+			state.sorting = action.payload?.filter((i) => i[1] !== undefined) || [];
+		},
 	},
 	extraReducers: (builder) => {
 		builder.addCase('persist/REHYDRATE', (state, action) => {
 			console.log('persist/REHYDRATE');
-			const incomingState = action.payload?.table || {};
+			const typedAction = action as PayloadAction<{table: FiltersState}>;
+			const incomingState = typedAction.payload?.table || {};
 			console.log('start', initialState);
 
-			const result = deepMerge(incomingState, initialState, 5);
-			console.log('end', result);
+			const result = deepMerge(incomingState, initialState, 5) as FiltersState;
+
+			result.sorting = incomingState.sorting || [];
+
+			const filtersKeys = Object.keys(result.filters) as FiltersNamesType[];
+			for (const filterKey of filtersKeys) {
+				const validator = result.validators?.[filterKey] as (i: string) => boolean;
+				if (validator && result.filters[filterKey].length) {
+					// @ts-expect-error it will be the same types because filterKey is the same
+					result.filters[filterKey] = result.filters[filterKey].filter(validator);
+				}
+			}
+
+			if (result.showedFiltersOrder.length) {
+				result.showedFiltersOrder = result.showedFiltersOrder.filter((i) => {
+					return result.filters[i].length && result.filters[i].length > 0;
+				});
+			}
+
 			return result;
 		});
 	},

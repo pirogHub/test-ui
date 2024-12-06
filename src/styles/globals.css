@@ -160,6 +160,7 @@
 }
 
 body {
+	overflow-y: scroll;
 	--sb-track-color: #ffffff;
 	--sb-thumb-color: #00000033;
 	--sb-size: 6px;

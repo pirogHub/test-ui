@@ -27,7 +27,8 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.2",
     "react-redux": "^9.1.2",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
