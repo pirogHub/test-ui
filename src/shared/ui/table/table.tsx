@@ -152,22 +152,10 @@ const CustomizeCellContent: (
 	return content;
 };
 
-// const descendingComparator: DataGridProps['columns'][0]['sortComparator'] = (a, b, cell1, cell2) => {
-// 	// console.log(a, b, cell1, cell2);
-// 	if (cell1.field === 'status' || typeof a === 'string') {
-// 		return -1 * (a as string).localeCompare(b as string);
-// 	}
-
-// 	return a - b > 0 ? -1 : 1;
-// };
 const TablePaginationSelect = styled(Select, {
 	name: 'MuiTablePagination',
 	slot: 'Select',
 	overridesResolver: (props, styles) => ({
-		// [`& .${tablePaginationClasses.selectIcon}`]: styles.selectIcon,
-		// [`& .${tablePaginationClasses.select}`]: styles.select,
-		// ...styles.input,
-		// ...styles.selectRoot,
 		[`&:after`]: {
 			content: '',
 		},
@@ -296,6 +284,8 @@ const CustomFooterStatusComponent = (
 };
 
 const HeaderCellRoot = styled('div', {
+	label: 'HeaderCellRoot',
+	name: 'HeaderCellRoot',
 	shouldForwardProp: (prop) => prop !== 'hover',
 })<{hover?: boolean}>`
 	display: flex;
@@ -368,7 +358,7 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 			outline: 'none',
 		},
 		'& .MuiDataGrid-columnSeparator': {
-			display: 'none',
+			display: 'none', // resize columns
 		},
 		'& .MuiDataGrid-topContainer': {
 			backgroundColor: colors.base6,
@@ -381,7 +371,7 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 			cursor: 'pointer',
 
 			border: 'none!important',
-			transition: 'all 0.4s ease',
+			// transition: 'all 0.4s ease',
 		},
 		'& .MuiDataGrid-columnHeader:hover': {
 			backgroundColor: colors.base4,
@@ -538,7 +528,7 @@ const ColumnAutosizing = () => {
 						);
 					},
 					field: key,
-					// headerName: labelDictionary[key as keyof Data],
+					headerName: labelDictionary[key as keyof Data],
 				};
 				return item;
 			});
@@ -552,14 +542,11 @@ const ColumnAutosizing = () => {
 				<StyledDataGrid
 					onRowClick={({...data}, e) => {
 						const row = data.row as Data;
-						// console.log('row row', data, e);
 
 						router.push(`/application/${row.appNumber}`).catch(() => {});
 					}}
 					apiRef={apiRef}
 					density="standard"
-					sortingOrder={['desc', 'asc']}
-					disableColumnResize={true}
 					disableColumnFilter={true}
 					disableColumnMenu={true}
 					disableColumnSelector={true}
@@ -576,16 +563,13 @@ const ColumnAutosizing = () => {
 						columnUnsortedIcon: () => (
 							<Icon2 isNotIcon sx={{opacity: 0.55}} size={16} url={getIconUrlByName('sortArrowsDown')} />
 						),
-						// pagination: CustomPagination,
-						// pagination: Pagination,
+
 						footer: () => (
 							<CustomFooterStatusComponent
 								disabled={getFilteredRowsIsLoading}
 								pageSizeOptions={[5, 10, 25]}
 							/>
-						), //CustomFooterStatusComponent,
-
-						// columnUnsortedIcon: UnsortedIcon,
+						),
 					}}
 					// columns={[
 					// 		{flex: 1, field: 'id', headerName: 'Brand ID'},

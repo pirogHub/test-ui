@@ -19,6 +19,7 @@ const iconsUrlData = {
 	quill: '/img/icons/quill-label.svg',
 	plus: '/img/icons/plus.svg',
 	filterAdd: '/img/icons/filter-add.svg',
+	logout: '/img/icons/logout.svg',
 };
 
 export type MyIconName = keyof typeof iconsUrlData;

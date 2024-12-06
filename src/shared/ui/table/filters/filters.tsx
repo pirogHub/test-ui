@@ -108,7 +108,7 @@ const FiltersVariants = () => {
 				};
 			});
 			// fetchByFiltersForce();
-			fetchByFiltersForce(true).catch(console.error);
+			fetchByFiltersForce();
 		},
 		[setFiltersListShowed, fetchByFiltersForce],
 	);
