@@ -37,13 +37,13 @@ export const useNormalQuery = <FetchArgs, FetchedDataType>({
 	onErrorRef.current = onError;
 
 	const fetchByQuery = useCallback(
-		async (notDuplicate?: true) => {
-			if (notDuplicate && !disableAutoFetchByChangedQueryKey) {
+		async (props?: {noConflictWithAutoFetch?: true}) => {
+			if (props?.noConflictWithAutoFetch && !disableAutoFetchByChangedQueryKey) {
 				console.log('safe duplicate');
 
 				return;
 			}
-			console.log('fetchByQuery');
+			console.log('fetchByQuery', queryKeyRef.current);
 
 			try {
 				setIsLoading(true);
@@ -88,10 +88,29 @@ export const useNormalQuery = <FetchArgs, FetchedDataType>({
 		}
 	}, [isDebounceLoading, disableAutoFetchByChangedQueryKey]);
 
+	const [queueFetchFlag, setQueueFetchFlag] = useState(false);
+	const readyToFetchRef = useRef(false);
+
+	const putFetchInQuery = useCallback(() => {
+		setQueueFetchFlag((prev) => true);
+		readyToFetchRef.current = true;
+	}, []);
+
+	useEffect(() => {
+		// if (!queueFetchFlag) return;
+		if (!readyToFetchRef.current) return;
+		readyToFetchRef.current = false;
+		queryKeyRef.current = queryKey;
+		console.log('fetch');
+
+		fetchByQuery({noConflictWithAutoFetch: true}).catch(() => {});
+		// setQueueFetchFlag(false);
+	}, [queryKey, fetchByQuery]);
+
 	return {
 		isLoading,
 		error,
-		fetchByQuery,
+		fetchByQuery: putFetchInQuery,
 		fetchManualParams: queryFn,
 		isSuccess,
 		data,

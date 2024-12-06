@@ -5,8 +5,8 @@ import type {NextApiRequest, NextApiResponse} from 'next';
 export default function handler(req: NextApiRequest, res: NextApiResponse<User>) {
 	res.status(200).json({
 		id: 1,
-		email: 'email',
-		name: 'name',
+		email: 'email@email.com',
+		name: 'Человек',
 		role: 'default',
 		avatar: '/img/icons/user-02.svg',
 	});

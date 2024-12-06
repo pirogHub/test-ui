@@ -75,7 +75,7 @@ export const useTableStore = () => {
 		isSuccess: getFilteredRowsIsSuccess,
 	} = useNormalQuery<Parameters<typeof api.fetchFilteredRows>[0], ReturnType<typeof api.fetchFilteredRows>>({
 		// initialData: [],
-		// disableAutoFetchByChangedQueryKey: true,
+		disableAutoFetchByChangedQueryKey: true,
 		queryKey: fetchQuery,
 		queryFn: api.fetchFilteredRows,
 		fetchOnMount: false,
@@ -106,9 +106,13 @@ export const useTableStore = () => {
 		};
 		const newQuery = createQueryParamsFromFilter({filters: notEmptyFilters, sorting});
 		// console.log('newQuery', {notEmptyFilters, sorting});
-
+		console.log('- new query prepare');
 		setFetchQuery(newQuery);
 	}, [filters, sorting]);
+
+	useEffect(() => {
+		console.log('- new query created newQuery');
+	}, [fetchQuery]);
 
 	return {
 		data: {

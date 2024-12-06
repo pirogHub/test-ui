@@ -85,6 +85,16 @@ function deepMerge(target: unknown, source: unknown, depth: number = 5): unknown
 // 	start: Date | null;
 // 	end: Date | null;
 // };
+type ValidatorsType = {
+	type?: (i: string) => boolean;
+	status?: (i: StatusTypes) => boolean;
+	executor?: (i: string) => boolean;
+	sorting?: (i: string) => boolean;
+};
+const validatorMap: ValidatorsType = {
+	type: (i) => TypesSChema.safeParse(i).success,
+	status: (i) => StatusTypesSchema.safeParse(i).success,
+};
 
 type FiltersState = {
 	filters: {
@@ -93,12 +103,7 @@ type FiltersState = {
 		executor: string[];
 	};
 	sorting?: [string, 'asc' | 'desc' | undefined][]; // TODO
-	validators?: {
-		type?: (i: string) => boolean;
-		status?: (i: StatusTypes) => boolean;
-		executor?: (i: string) => boolean;
-		sorting?: (i: string) => boolean;
-	};
+
 	showedFiltersOrder: FiltersNamesType[];
 	filteredRows: unknown[]; // TODO
 };
@@ -112,11 +117,7 @@ const initialState: FiltersState = {
 		executor: [],
 	},
 	sorting: [],
-	validators: {
-		type: (i) => TypesSChema.safeParse(i).success,
-		status: (i) => StatusTypesSchema.safeParse(i).success,
-		// executor?: (i) => ;
-	},
+
 	showedFiltersOrder: [],
 	filteredRows: [],
 };
@@ -160,7 +161,7 @@ const tableSlice = createSlice({
 
 			const filtersKeys = Object.keys(result.filters) as FiltersNamesType[];
 			for (const filterKey of filtersKeys) {
-				const validator = result.validators?.[filterKey] as (i: string) => boolean;
+				const validator = validatorMap?.[filterKey] as (i: string) => boolean;
 				if (validator && result.filters[filterKey].length) {
 					// @ts-expect-error it will be the same types because filterKey is the same
 					result.filters[filterKey] = result.filters[filterKey].filter(validator);
