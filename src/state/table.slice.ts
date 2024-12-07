@@ -211,13 +211,14 @@ const tableSlice = createSlice({
 		},
 		setShowedFiltersOrder: (
 			state,
-			action: PayloadAction<{data: TableFiltersState['showedFiltersOrder'][0]; clearAll?: boolean}>,
+			action: PayloadAction<{data: TableFiltersState['showedFiltersOrder'][0] | null; clearAll?: boolean}>,
 		) => {
 			const {data, clearAll} = action.payload;
 			if (clearAll) {
 				state.showedFiltersOrder = [];
 				return;
 			}
+			if (!data) return;
 			const index = state.showedFiltersOrder.findIndex((i) => i === data);
 			if (index !== -1) {
 				state.showedFiltersOrder.splice(index, 1);

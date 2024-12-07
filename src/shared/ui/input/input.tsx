@@ -40,6 +40,56 @@ const Root = styled('div', {
 	&.error:has(input:focus) {
 		outline: 2px solid ${({theme}) => (theme as skyAllianceMUITheme).colors.error};
 	}
+
+	& label {
+		position: absolute;
+		left: 5px;
+		top: 50%;
+		transform: translateY(-50%);
+		/* width: 50px; */
+		text-align: center;
+		pointer-events: none;
+		transition: 0.3s ease all;
+		font-size: 15px;
+		color: ${({theme}) => (theme as skyAllianceMUITheme).colors.text3};
+	}
+
+	& input:focus + label {
+		position: absolute;
+		left: 0;
+		transform: ${(p) =>
+			p.size === 'medium' ? 'translateY(-130%) translateX(3%)' : 'translateY(-150%) translateX(-10%)'};
+
+		/* width: 50px; */
+		text-align: center;
+		transition: 0.2s ease all;
+		font-size: ${(p) => (p.size === 'medium' ? '11px' : '13px')};
+	}
+	& label.onManualTop {
+		position: absolute;
+		left: 0;
+		transform: translateY(-150%) translateX(-10%);
+		/* width: 50px; */
+		text-align: center;
+		transition: 0.2s ease all;
+		font-size: ${(p) => (p.size === 'medium' ? '11px' : '13px')};
+	}
+
+	& .placeholder {
+		position: absolute;
+		height: 30px;
+		inset: 0;
+		left: 4px;
+		display: flex;
+		text-align: center;
+		pointer-events: none;
+		transition: 0.3s ease all;
+		justify-content: start;
+		align-items: center;
+		line-height: 16px;
+		font-size: 13px;
+		color: ${({theme}) => (theme as skyAllianceMUITheme).colors.text4};
+	}
 `;
 
 export const FormFieldInput = styled('input', {
@@ -90,53 +140,6 @@ const StyledInputWrapper = styled('div')`
 		}
 		line-height: 16px;
 		border-radius: 6px;
-	}
-	& > label {
-		position: absolute;
-		left: 5px;
-		top: 50%;
-		transform: translateY(-50%);
-		/* width: 50px; */
-		text-align: center;
-		pointer-events: none;
-		transition: 0.3s ease all;
-		font-size: 15px;
-		color: ${({theme}) => (theme as skyAllianceMUITheme).colors.text3};
-	}
-
-	& > input:focus + label {
-		position: absolute;
-		left: 0;
-		transform: translateY(-150%) translateX(-10%);
-		/* width: 50px; */
-		text-align: center;
-		transition: 0.2s ease all;
-		font-size: 13px;
-	}
-	& > label.onManualTop {
-		position: absolute;
-		left: 0;
-		transform: translateY(-150%) translateX(-10%);
-		/* width: 50px; */
-		text-align: center;
-		transition: 0.2s ease all;
-		font-size: 13px;
-	}
-
-	& > .placeholder {
-		position: absolute;
-		height: 30px;
-		inset: 0;
-		left: 4px;
-		display: flex;
-		text-align: center;
-		pointer-events: none;
-		transition: 0.3s ease all;
-		justify-content: start;
-		align-items: center;
-		line-height: 16px;
-		font-size: 13px;
-		color: ${({theme}) => (theme as skyAllianceMUITheme).colors.text4};
 	}
 `;
 
@@ -257,6 +260,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 								as={inputAs}
 								value={value}
 								{...props}
+								placeholder=""
 								// ref={ref}
 								ref={inputRef}
 								onFocus={(e) => {

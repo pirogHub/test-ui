@@ -16,10 +16,13 @@ const createQueryParamsFromFilter = (filters: Record<string, unknown>) => {
 				newQuery.set(key, JSON.stringify(value));
 			}
 		} else if (value) {
-			//  if (value && typeof value === 'object') {
-			// 	newQuery.set(key, createQueryParamsFromFilter(value));
-			// }
-			newQuery.set(key, JSON.stringify(value));
+			if (typeof value === 'object') {
+				if (Object.keys(value).length) {
+					newQuery.set(key, JSON.stringify(value));
+				}
+			} else {
+				newQuery.set(key, JSON.stringify(value));
+			}
 		}
 	});
 	return newQuery.toString();
@@ -36,6 +39,17 @@ const createQueryParamsFromFilter = (filters: Record<string, unknown>) => {
 // 		return data;
 // 	}
 // };
+
+const getSelectedKeysArray = (data: Record<string, boolean | undefined>) => {
+	const selectedKeys = Object.entries(data).reduce((acc, [key, val]) => {
+		if (val) {
+			acc.push(key);
+		}
+		return acc;
+	}, [] as string[]);
+
+	return selectedKeys?.length ? selectedKeys : null;
+};
 
 export const useTableStore = () => {
 	const dispatch = useAppDispatch();
@@ -99,15 +113,42 @@ export const useTableStore = () => {
 	const fetchedRowsByFilters = useAppSelector((state) => state.table.fetchedRowsByFilters);
 
 	useEffect(() => {
-		const notEmptyFilters = {
-			...(filters?.executor?.length ? {executor: filters.executor} : {}),
-			...(filters?.status?.length ? {status: filters.status} : {}),
-			...(filters?.type?.length ? {type: filters.type} : {}),
-		};
-		const newQuery = createQueryParamsFromFilter({filters: notEmptyFilters, sorting});
+		// const notEmptyFilters = {
+		// 	...(filters?.executor?.length ? {executor: filters.executor} : {}),
+		// 	...(filters?.status?.length ? {status: filters.status} : {}),
+		// 	...(filters?.type?.length ? {type: filters.type} : {}),
+		// };
+		// const newQuery = createQueryParamsFromFilter({filters: notEmptyFilters, sorting});
 		// console.log('newQuery', {notEmptyFilters, sorting});
-		console.log('- new query prepare');
-		setFetchQuery(newQuery);
+		// const ttt = Object.entries(filters.executor).reduce((acc, [key, val]) => {
+		// 	if (val) {
+		// 		acc.push(key);
+		// 	}
+		// 	return acc;
+		// }, [] as string[]);
+
+		// const e = getSelectedKeysArray(filters.executor);
+		const notEmptyFilters = Object.entries(filters).reduce(
+			(acc, [key, val]) => {
+				const arr = getSelectedKeysArray(val);
+				if (arr) {
+					acc[key] = arr;
+				}
+				return acc;
+			},
+			{} as Record<string, string[]>,
+		);
+
+		const newQuery = createQueryParamsFromFilter({filters: notEmptyFilters, sorting});
+		// const notEmptyFilters = {
+		// 	...(filters?.executor?.length ? {executor: filters.executor} : {}),
+		// 	...(filters?.status?.length ? {status: filters.status} : {}),
+		// 	...(filters?.type?.length ? {type: filters.type} : {}),
+		// };
+		console.log('notEmptyFilters: ', notEmptyFilters);
+
+		console.log('- new query prepare: ', newQuery);
+		// setFetchQuery(newQuery);
 	}, [filters, sorting]);
 
 	useEffect(() => {

@@ -14,8 +14,14 @@ import {
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 import {useCustomStore} from '@/shared/providers/store-provider';
 import {Icon2} from '@/shared/ui/icon';
+import {StatusBadge} from '@/shared/ui/status-badge';
 
 import {NewFilter, NewFilterSortFunctionType} from './filter/filter';
+
+const translateAppTypes = {
+	inner: 'Внутренняя',
+	outer: 'Заказная',
+};
 
 const dataStatus = [...ProposalStatusIdList].map((i) => ({id: i, name: i}));
 const dataType = [...ProposalTypeIdList].map((i) => ({id: i, name: i}));
@@ -31,9 +37,18 @@ const datasMap = {
 	status: {
 		data: dataStatus,
 		iconName: 'quill',
+		renderItem: (item: (typeof dataStatus)[0]) => <StatusBadge status={item.id} />,
 	},
-	type: {data: dataType, iconName: 'sliders'},
-	executor: {data: dataExecutors, iconName: 'user02'},
+	type: {
+		data: dataType,
+		iconName: 'sliders',
+		renderItem: (item: (typeof dataType)[0]) => <span>{translateAppTypes[item.name]}</span>,
+	},
+	executor: {
+		data: dataExecutors,
+		iconName: 'user02',
+		renderItem: (item: (typeof dataExecutors)[0]) => <span>{item.name}</span>,
+	},
 } as const;
 
 const dataFilters: {id: FiltersNamesType; name: string}[] = [
@@ -41,6 +56,21 @@ const dataFilters: {id: FiltersNamesType; name: string}[] = [
 	{id: 'type', name: 'Type'},
 	{id: 'executor', name: 'Executor'},
 ];
+
+const dictionaryFilterData = {
+	status: {
+		label: 'Статус',
+		iconName: 'quill',
+	},
+	type: {
+		label: 'Тип',
+		iconName: 'sliders',
+	},
+	executor: {
+		label: 'Исполнитель',
+		iconName: 'user02',
+	},
+};
 
 const executorSearchTermFilterFunc: NewFilterSortFunctionType<ProposalExecutorIdType, ProposalExecutorType> = (
 	item,
@@ -59,32 +89,29 @@ const Page = () => {
 
 	const {setShowedFiltersOrder, showedFiltersOrder, data: filtersData, setters} = tableStore;
 
+	const [firstOpenSelectedFilter, setFirstOpenSelectedFilter] = React.useState<FiltersNamesType | null>(null);
+
 	const onSelectFilterToShow = useCallback(
-		(data: ProposalSetFilterActionType<FiltersNamesType>) => {
-			const [items] = data;
+		(val: ProposalSetFilterActionType<FiltersNamesType>) => {
+			const [items] = val;
 			const [item] = items;
 			setShowedFiltersOrder({data: item.id});
+			setFirstOpenSelectedFilter(item.id);
 		},
 		[setShowedFiltersOrder],
 	);
-
-	const {executor} = filtersData;
-	useEffect(() => {
-		console.log('showedFiltersOrder', showedFiltersOrder);
-	}, [showedFiltersOrder]);
 
 	const onFilterRemove = (filterId: FiltersNamesType) => {
 		setShowedFiltersOrder({data: filterId});
 	};
 
 	const clearAllFilters = () => {
-		setShowedFiltersOrder({data: [], clearAll: true});
+		setShowedFiltersOrder({data: null, clearAll: true});
 		setters.executor([[], false]);
 		setters.status([[], false]);
 		setters.type([[], false]);
+		console.log('fetch my rows: remove all filters');
 	};
-
-	console.log('datasMap', datasMap);
 
 	return (
 		<div style={{display: 'flex', flexDirection: 'row', gap: '10px'}}>
@@ -93,33 +120,54 @@ const Page = () => {
 				if (!itData) return null;
 				return (
 					<NewFilter
+						openWhenCreate={firstOpenSelectedFilter === it}
+						withCheckAll={it === 'executor'}
 						filterId={it}
 						key={it}
 						filterIconComponent={<Icon2 color="icon2" size={20} url={getIconUrlByName(itData.iconName)} />}
 						filterName={dataFilters.find((f) => f.id === it)?.name ?? ''}
-						onFilterRemove={() => onFilterRemove(it)}
+						onFilterRemove={() => {
+							onFilterRemove(it);
+
+							console.log('fetch my rows: remove filter');
+						}}
 						// @ts-expect-error TODO подумать как правильно описать типы, т к если вместо map писать каждый фильтр вручную, то ошибок типов не будет
 						allList={itData.data}
 						// @ts-expect-error TODO подумать как правильно описать типы, т к если вместо map писать каждый фильтр вручную, то ошибок типов не будет
 						alreadySelected={filtersData[it]}
-						// @ts-expect-error TODO подумать как правильно описать типы, т к если вместо map писать каждый фильтр вручную, то ошибок типов не будет
-						onSelect={setters[it]}
+						onSelect={(id) => {
+							setFirstOpenSelectedFilter(null);
+							// @ts-expect-error TODO подумать как правильно описать типы, т к если вместо map писать каждый фильтр вручную, то ошибок типов не будет
+							setters[it](id);
+						}}
 						// @ts-expect-error TODO подумать как правильно описать типы, т к если вместо map писать каждый фильтр вручную, то ошибок типов не будет
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
 						withThisSearchFunction={dataFiltersMap?.[it]?.withThisSearchFunction}
+						renderItem={itData.renderItem}
+						onSubmitFilter={() => {
+							console.log('fetch my rows: submit');
+						}}
+						onPopupClose={() => {
+							console.log('fetch my rows: popup close');
+						}}
+						onFilterValuesDrop={() => {}}
 					/>
 				);
 			})}
 
 			<div style={{width: '20px'}}></div>
 			<NewFilter
-				label=""
+				closeWhenSelect
+				minListWidth="150px"
+				noCheckbox
+				withoutShowCount
+				withoutChest
 				filterIconComponent={<Icon2 color="icon2" size={20} url={getIconUrlByName('filterAdd')} />}
 				filterId="add-filter"
 				hideIfEmpty
 				noFooterActions
 				hideIfChecked
-				filterName="Add Filter"
+				// filterName="Add Filter"
 				allList={dataFilters}
 				alreadySelected={useMemo(() => {
 					return showedFiltersOrder.reduce((acc, i) => {
@@ -127,6 +175,17 @@ const Page = () => {
 						return acc;
 					}, {} as ProposalFilterRecordType<FiltersNamesType>);
 				}, [showedFiltersOrder])}
+				renderItem={(item) => (
+					<div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+						<Icon2
+							sx={{opacity: 1}}
+							color="icon2"
+							size={20}
+							url={getIconUrlByName(dictionaryFilterData[item.id].iconName)}
+						/>
+						{dictionaryFilterData[item.id].label}
+					</div>
+				)}
 				onSelect={onSelectFilterToShow}
 			/>
 			{showedFiltersOrder.length > 0 && (

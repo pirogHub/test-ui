@@ -7,7 +7,9 @@ import {Checkbox, MenuItem, styled} from '@mui/material';
 import {getIconUrlByName} from '@/shared/icons/icons-data';
 import {Icon2} from '@/shared/ui/icon';
 
-export const FilterButton = styled('button')`
+export const FilterButton = styled('button', {
+	shouldForwardProp: (propName) => propName !== 'isOnlyIcon',
+})<{isOnlyIcon?: boolean}>`
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -20,6 +22,13 @@ export const FilterButton = styled('button')`
 	border: 1px solid ${(p) => (p.theme as skyAllianceMUITheme).colors.base4};
 	color: ${(p) => (p.theme as skyAllianceMUITheme).colors.text2};
 	background-color: ${(p) => (p.theme as skyAllianceMUITheme).colors.base1};
+
+	${(p) =>
+		p.isOnlyIcon &&
+		`
+	justify-content: center;
+	width: 40px;
+	`}
 
 	&:hover,
 	&.hover {
@@ -129,7 +138,7 @@ export const CheckAllMenuItem: React.FC<{
 				display: 'flex',
 				alignItems: 'center',
 				gap: '8px',
-				paddingInline: '8px',
+				paddingInline: '13px 8px',
 				paddingBlock: '8px',
 				opacity: disabled ? 0.4 : 1,
 			}}

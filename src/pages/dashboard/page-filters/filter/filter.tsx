@@ -9,107 +9,35 @@ import {
 	ProposalStatusIdList,
 	ProposalTypeIdList,
 } from '@/state/types';
+import {skyAllianceMUITheme} from '@/styles/theme';
 import {CircularProgress, Popover, styled} from '@mui/material';
 
+import {CustomFader} from '@/shared/ui/custom-fade/custom-fade';
 import {InputField} from '@/shared/ui/input';
 import {CheckAllMenuItem, ChestButton, FilterButton} from '@/shared/ui/table/filters/filter-item/filter-button';
 
-const DataLoading = () => {
-	return (
-		<div
-			style={{
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				alignSelf: 'center',
-				justifySelf: 'center',
-				maxWidth: '50px',
-				minHeight: '50px',
-			}}
-		>
-			<CircularProgress size={30} />
-		</div>
-	);
-};
-
-const ListItems = <FilterItemKeyType extends string, AllListItemType extends {id: FilterItemKeyType; name: string}>({
-	hideIfChecked,
-	allList,
-	alreadySelected,
-	isDataLoading,
-	errorLoadingDataMessage,
-}: {
-	hideIfChecked?: boolean;
-	errorLoadingDataMessage?: string;
-	isDataLoading?: boolean;
-	allList: AllListItemType[];
-	alreadySelected: Partial<Record<FilterItemKeyType, boolean>>;
-}) => {
-	if (errorLoadingDataMessage !== undefined) return <div>{errorLoadingDataMessage}</div>;
-	if (isDataLoading) return <DataLoading />;
-	return allList.length === 0
-		? 'no data'
-		: allList.map(({id, name}) => {
-				const isChecked = alreadySelected[id] ? '+' : '-';
-				const isCheckedBool = alreadySelected[id];
-				return hideIfChecked && isCheckedBool ? null : (
-					<li data-select-item-id={id} data-select-isChecked={alreadySelected[id]} key={id}>
-						{isChecked} {name}
-					</li>
-				);
-			});
-};
-
-const FilterRoot = styled('div')`
-	display: flex;
-	gap: 10px;
-	flex-direction: column;
-	padding-inline: 10px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	background-color: #f3edf3;
-
-	& .header {
-		padding-top: 10px;
-	}
-	& .fliter-name {
-		font-weight: 600;
-	}
-
-	& .footer {
-		display: flex;
-		gap: 10px;
-		flex-direction: column;
-	}
-
-	& ul {
-		padding: 0;
-		margin: 0;
-	}
-	& li {
-		list-style: none;
-		border: 1px solid #dddcdc;
-		margin-block: 2px;
-		cursor: pointer;
-
-		&:hover {
-			background-color: #dddcdc;
-		}
-	}
-`;
-
-const popoverAnchorOrigin: React.ComponentProps<typeof Popover>['anchorOrigin'] = {
-	vertical: 'bottom',
-	horizontal: 'left',
-};
+import {
+	DataLoading,
+	FIlterDivider,
+	FilterFooter,
+	FilterHeader,
+	FilterRoot,
+	ListItems,
+	SearchTermInput,
+	popoverAnchorOrigin,
+} from './filter-components/filter-components';
 
 type NewFilterProps<FilterItemKeyType extends string, AllListItemType extends {id: FilterItemKeyType; name: string}> = {
+	minListWidth?: string;
+	noCheckbox?: boolean;
+	withoutShowCount?: boolean;
 	filterIconComponent?: React.ReactNode;
 	filterId: string; // | FiltersNamesType;
 	hideIfEmpty?: boolean;
 	hideIfChecked?: boolean;
 	noFooterActions?: boolean;
 	withThisSearchFunction?: (item: AllListItemType, searchTerm: string) => boolean;
-	filterName: string;
+	filterName?: string;
 	allList: AllListItemType[];
 	alreadySelected: Partial<Record<FilterItemKeyType, boolean>>;
 	// onSelect: (keysArr: {key: FilterItemKeyType; val: boolean}[]) => void;
@@ -123,7 +51,7 @@ type NewFilterProps<FilterItemKeyType extends string, AllListItemType extends {i
 	closeWhenSelect?: boolean;
 	withCheckAll?: boolean;
 	withoutChest?: boolean;
-	label: string;
+	// label: string;
 	renderItem: (item: AllListItemType) => React.ReactNode;
 	openWhenCreate?: boolean;
 };
@@ -132,6 +60,8 @@ export const NewFilter = <
 	FilterItemKeyType extends string,
 	AllListItemType extends {id: FilterItemKeyType; name: string},
 >({
+	minListWidth,
+	withoutShowCount,
 	filterIconComponent,
 	filterId,
 	onPopupClose,
@@ -151,9 +81,10 @@ export const NewFilter = <
 	isDataLoading,
 	errorLoadingDataMessage,
 	onFilterRemove,
-	label,
+	// label,
 	renderItem,
 	openWhenCreate,
+	noCheckbox,
 }: NewFilterProps<FilterItemKeyType, AllListItemType>) => {
 	// const alreadySelected: Record<string, boolean> = {};
 
@@ -170,7 +101,7 @@ export const NewFilter = <
 		const item = target.closest('[data-select-item-id]');
 		const itemId = item?.getAttribute('data-select-item-id') as FilterItemKeyType; //(T[0]['key'];
 		if (!itemId) return;
-		const isChecked = item?.getAttribute('data-select-isChecked') === 'true' ? true : false;
+		const isChecked = item?.getAttribute('data-select-is-checked') === 'true' ? true : false;
 
 		onSelect([[{id: itemId, val: !isChecked}]]);
 		if (closeWhenSelect) {
@@ -178,17 +109,31 @@ export const NewFilter = <
 		}
 	};
 
-	const selectedCount = useMemo(
+	const allCheckedCount = useMemo(
 		() => (alreadySelected ? Object.keys(alreadySelected).length : undefined),
 		[alreadySelected],
 	);
 
-	const isAllSelected = useMemo(() => {
+	const allShowedCheckedCount = useMemo(() => {
+		const allShowedSelectedCount = filteredDataToShow.length
+			? filteredDataToShow.filter((i) => alreadySelected[i.id]).length
+			: 0;
+		console.log('allShowedSelectedCount', allShowedSelectedCount);
+
+		// return filteredDataToShow.length === allShowedSelectedCount;
+		return allShowedSelectedCount;
+	}, [alreadySelected, filteredDataToShow]);
+
+	const isAllShowedSelected = useMemo(() => {
 		const isAllShowedSelected = filteredDataToShow.length
 			? filteredDataToShow.every((i) => alreadySelected[i.id])
 			: false;
 		return isAllShowedSelected;
 	}, [alreadySelected, filteredDataToShow]);
+	const isAllSelected = useMemo(() => {
+		const isAllSelected = allList.length ? allList.every((i) => alreadySelected[i.id]) : false;
+		return isAllSelected;
+	}, [alreadySelected, allList]);
 
 	const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -209,20 +154,48 @@ export const NewFilter = <
 			if (select) {
 				onSelect([filteredDataToShow, true]);
 			} else {
-				onSelect([allList, false]);
+				// onSelect([allList, false]);
+				onSelect([filteredDataToShow, false]);
 			}
-			closePopup();
+			// closePopup();
 		},
 		[onSelect, filteredDataToShow],
 	);
 
 	const isPopupOpenSafe = Boolean(anchorEl) && isPopupOpen;
 
+	const onRemoveFilterClick = useCallback(
+		(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+			e.stopPropagation();
+			selectCurrentDeselectAll({select: false});
+			onFilterRemove?.();
+		},
+		[selectCurrentDeselectAll, onFilterRemove],
+	);
+
 	useEffect(() => {
 		if (hideIfEmpty && isAllSelected) {
 			setIsPopupOpen(false);
 		}
 	}, [hideIfEmpty, isAllSelected]);
+
+	// useEffect(() => {
+	// 	if (openWhenCreate && anchorElRef.current) {
+	// 		setIsPopupOpen(true);
+	// 	}
+	// }, [openWhenCreate, anchorElRef]);
+
+	useEffect(() => {
+		// toremove
+		if (openWhenCreate) {
+			setIsPopupOpen(true);
+		}
+	}, [openWhenCreate]);
+
+	const [allCheckedCountFreezeBeforeClose, setCheckedCountFreezeBeforeClose] = useState(allCheckedCount);
+	useEffect(() => {
+		if (allCheckedCount !== 0) setCheckedCountFreezeBeforeClose(allCheckedCount);
+	}, [allCheckedCount]);
 
 	if (hideIfEmpty && isAllSelected) return null;
 	return (
@@ -234,22 +207,21 @@ export const NewFilter = <
 					setIsPopupOpen(true);
 				}}
 				className="header"
+				isOnlyIcon={!filterName}
 			>
-				<span className="fliter-name">{filterName}</span>
-				{!withoutChest && (
-					<ChestButton
-						onClick={(e) => {
-							e.stopPropagation();
-							selectCurrentDeselectAll({select: false});
-							onFilterRemove?.();
-						}}
-					/>
+				{filterIconComponent}
+				{filterName && <span className="fliter-name">{filterName}</span>}
+				{!withoutShowCount && (
+					<CustomFader className={`${!allCheckedCount && 'hide'}`}>
+						<CheckedCountInfo>{allCheckedCountFreezeBeforeClose}</CheckedCountInfo>
+					</CustomFader>
 				)}
+
+				{!withoutChest && <ChestButton onClick={onRemoveFilterClick} />}
 			</FilterButton>
 			<Popover
 				id={isPopupOpenSafe ? `popup-menu-${filterId}` : undefined}
 				open={isPopupOpenSafe}
-				// anchorEl={anchorEl}
 				// @ts-expect-error toremove
 				anchorEl={() => anchorElRef.current || null}
 				onClose={closePopup}
@@ -258,51 +230,44 @@ export const NewFilter = <
 					marginTop: '5px',
 				}}
 			>
-				{withThisSearchFunction ? (
-					<InputField
-						isWithClearButton
-						isWithoutErrors
-						debounceMs={500}
-						onChangeValue={setSearchTerm}
-						sizeInput="medium"
-						sxWrapper={{margin: '8px '}}
-					/>
-				) : null}
-				{withCheckAll && (
-					<CheckAllMenuItem
-						disabled={!filteredDataToShow?.length || isDataLoading}
-						onClick={() => selectCurrentDeselectAll({select: true})}
-						isSelectedAll={isAllSelected}
-					/>
-				)}
-				<div style={{borderBottom: '1px solid rgba(234, 234, 234, 1)'}}></div>
+				<FilterHeader>
+					{withThisSearchFunction ? <SearchTermInput setSearchTerm={setSearchTerm} /> : null}
+					{withCheckAll && (
+						<CheckAllMenuItem
+							disabled={!filteredDataToShow?.length || isDataLoading}
+							onClick={() => selectCurrentDeselectAll({select: !isAllShowedSelected})}
+							isSelectedAll={isAllShowedSelected}
+						/>
+					)}
 
-				<ul className="list" onClick={onSelectItem}>
+					<FIlterDivider />
+				</FilterHeader>
+				<div style={{...(minListWidth ? {minWidth: minListWidth} : {})}}>
 					<ListItems
+						noCheckbox={noCheckbox}
+						onSelectItem={onSelectItem}
 						hideIfChecked={hideIfChecked}
 						isDataLoading={isDataLoading}
 						errorLoadingDataMessage={errorLoadingDataMessage}
 						allList={filteredDataToShow}
 						alreadySelected={alreadySelected}
+						renderItem={renderItem}
 					/>
-				</ul>
+				</div>
 				{!noFooterActions && (
-					<div className="footer">
-						<div className="controls">
-							<button onClick={onSubmitFilter}>Submit</button>
-							<button
-								onClick={() => {
-									// selectDeselectAll({select: false});
-									onSelect([filteredDataToShow, false]);
-									onFilterValuesDrop?.();
-								}}
-							>
-								clear all
-							</button>
-						</div>
-
-						<span className="info">isAllSelected: {isAllSelected ? '+' : '-'}</span>
-					</div>
+					<FilterFooter
+						disableButtons={isDataLoading}
+						// disableFilterDrop={allCheckedCount === 0}
+						disableFilterDrop={allShowedCheckedCount === 0}
+						onSubmitFilter={() => {
+							setIsPopupOpen(false);
+							onSubmitFilter?.();
+						}}
+						onFilterDrop={() => {
+							onSelect([filteredDataToShow, false]);
+							onFilterValuesDrop?.();
+						}}
+					/>
 				)}
 			</Popover>
 		</FilterRoot>
@@ -313,3 +278,17 @@ export type NewFilterSortFunctionType<
 	KeysIdType extends string,
 	AllListItemType extends {id: KeysIdType; name: string},
 > = Exclude<React.ComponentProps<typeof NewFilter<KeysIdType, AllListItemType>>['withThisSearchFunction'], undefined>;
+
+export const CheckedCountInfo = styled('div')`
+	padding: 4px;
+	border-radius: 5px;
+	background-color: ${(p) => (p.theme as skyAllianceMUITheme).colors.backgroundAccent};
+	color: ${(p) => (p.theme as skyAllianceMUITheme).colors.primary1};
+	width: 20px;
+	height: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 11px;
+	font-weight: 600;
+`;
