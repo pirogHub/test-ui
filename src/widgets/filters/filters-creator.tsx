@@ -1,6 +1,8 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 
+import {MyBaseApi} from '@/api/base';
 import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
+import {NewFilter, NewFilterSortFunctionType} from '@/pages/dashboard/page-filters/filter/filter';
 import {
 	FiltersNamesType,
 	ProposalExecutorIdType,
@@ -11,12 +13,11 @@ import {
 	ProposalTypeIdList,
 } from '@/state/types';
 
+import {useNormalQuery} from '@/shared/hooks/use-normal-query';
 import {MyIconName, getIconUrlByName} from '@/shared/icons/icons-data';
 import {useCustomStore} from '@/shared/providers/store-provider';
 import {Icon2} from '@/shared/ui/icon';
 import {StatusBadge} from '@/shared/ui/status-badge';
-
-import {NewFilter, NewFilterSortFunctionType} from './filter/filter';
 
 const translateAppTypes = {
 	inner: 'Внутренняя',
@@ -47,7 +48,7 @@ const datasMap = {
 	executor: {
 		data: dataExecutors,
 		iconName: 'user02',
-		renderItem: (item: (typeof dataExecutors)[0]) => <span>{item.name}</span>,
+		renderItem: (item: (typeof dataExecutors)[0]) => <span key={item.id}>{item.name}</span>,
 	},
 } as const;
 
@@ -84,10 +85,40 @@ const dataFiltersMap = {
 	},
 } as const;
 
-const Page = () => {
+export const FiltersCreator = () => {
 	const {tableStore} = useCustomStore();
 
+	const [executorsList, setExecutorsList] = React.useState<{id: number; key: string; name: string}[]>([]);
+	const [executorPendingError, setExecutorPendingError] = React.useState<string | undefined>();
+	const {
+		isLoading: isExecutorPending,
+		isSuccess,
+		error,
+	} = useNormalQuery({
+		queryKey: ['executors'],
+		queryFn: MyBaseApi.fetchExecutors,
+		disableAutoFetchByChangedQueryKey: true,
+		fetchOnMount: true,
+		timeoutBeforeMountFetch: 100,
+		onSuccess: (data) => {
+			console.log('data', data);
+			if (data.type === 'success') {
+				setExecutorsList(data.data);
+			} else {
+				setExecutorPendingError('error on fetching'); // TODO add transform todo inside useNormalQuery
+			}
+		},
+		onError: (error) => {
+			setExecutorPendingError('error on fetching 2');
+			// toast
+		},
+	});
+
 	const {setShowedFiltersOrder, showedFiltersOrder, data: filtersData, setters, fetchRowsByQuery} = tableStore;
+
+	useEffect(() => {
+		console.log('showedFiltersOrder', showedFiltersOrder);
+	}, [showedFiltersOrder]);
 
 	const [firstOpenSelectedFilter, setFirstOpenSelectedFilter] = React.useState<FiltersNamesType | null>(null);
 
@@ -107,18 +138,32 @@ const Page = () => {
 
 	const clearAllFilters = () => {
 		setShowedFiltersOrder({data: null, clearAll: true});
-		setters.executor([[], false]);
+		setters.executor([[], false]); // TODO а что если передать [], true ? м б использовать объявление типов как в startListening c его never. startListening в createListenerMiddleware from redux-toolkit
 		setters.status([[], false]);
 		setters.type([[], false]);
+
 		// console.log('fetch my rows: remove all filters');
 		fetchRowsByQuery({testData: 'by remove all filters'});
 	};
 
 	return (
-		<div style={{display: 'flex', flexDirection: 'row', gap: '10px'}}>
+		<div style={{display: 'flex', flexDirection: 'row', gap: '8px'}}>
 			{showedFiltersOrder.map((it) => {
+				console.log('!!!!!!!!!!!!!');
+
 				const itData = datasMap[it];
 				if (!itData) return null;
+				let isLoading = false;
+				let isError = false;
+				let realData = datasMap[it].data;
+				let errorLoadingDataMessage = undefined;
+				if (it === 'executor') {
+					isLoading = isExecutorPending;
+					// isError = !!executorPendingError;
+					// @ts-expect-error создать общий тип
+					realData = executorsList;
+					errorLoadingDataMessage = executorPendingError;
+				}
 				return (
 					<NewFilter
 						openWhenCreate={firstOpenSelectedFilter === it}
@@ -126,7 +171,7 @@ const Page = () => {
 						filterId={it}
 						key={it}
 						filterIconComponent={<Icon2 color="icon2" size={20} url={getIconUrlByName(itData.iconName)} />}
-						filterName={dataFilters.find((f) => f.id === it)?.name ?? ''}
+						filterName={dictionaryFilterData[it].label || it}
 						onFilterRemove={() => {
 							onFilterRemove(it);
 
@@ -134,7 +179,11 @@ const Page = () => {
 							fetchRowsByQuery({testData: `by remove filter: ${it}`});
 						}}
 						// @ts-expect-error TODO подумать как правильно описать типы, т к если вместо map писать каждый фильтр вручную, то ошибок типов не будет
-						allList={itData.data}
+						// allList={itData.data}
+						allList={realData}
+						isDataLoading={isLoading}
+						isError={isError}
+						errorLoadingDataMessage={errorLoadingDataMessage}
 						// @ts-expect-error TODO подумать как правильно описать типы, т к если вместо map писать каждый фильтр вручную, то ошибок типов не будет
 						alreadySelected={filtersData[it]}
 						onSelect={(id) => {
@@ -160,7 +209,6 @@ const Page = () => {
 				);
 			})}
 
-			<div style={{width: '20px'}}></div>
 			<NewFilter
 				closeWhenSelect
 				minListWidth="150px"
@@ -180,16 +228,19 @@ const Page = () => {
 						return acc;
 					}, {} as ProposalFilterRecordType<FiltersNamesType>);
 				}, [showedFiltersOrder])}
-				renderItem={(item) => (
-					<div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-						<Icon2
-							sx={{opacity: 1}}
-							color="icon2"
-							size={20}
-							url={getIconUrlByName(dictionaryFilterData[item.id].iconName)}
-						/>
-						{dictionaryFilterData[item.id].label}
-					</div>
+				renderItem={useCallback(
+					(item: {id: 'type' | 'status' | 'executor'; name: string}) => (
+						<div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+							<Icon2
+								sx={{opacity: 1}}
+								color="icon2"
+								size={20}
+								url={getIconUrlByName(dictionaryFilterData[item.id].iconName)}
+							/>
+							{dictionaryFilterData[item.id].label}
+						</div>
+					),
+					[],
 				)}
 				onSelect={onSelectFilterToShow}
 			/>
@@ -199,5 +250,3 @@ const Page = () => {
 		</div>
 	);
 };
-
-export default Page;

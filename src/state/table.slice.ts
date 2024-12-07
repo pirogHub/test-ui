@@ -1,17 +1,52 @@
-import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {z} from 'zod';
+import {MyBaseApi} from '@/api/base';
+import {PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {set, z} from 'zod';
 
 import {StatusTypes} from '@/shared/ui/status-badge/badge-status';
 
+import {fetchRowsByQuery} from './table.asyncthunk';
 import {
 	FiltersNamesType,
 	ProposalExecutorIdType,
 	ProposalFilterRecordType,
+	ProposalQueryObjectType,
 	ProposalSetFilterActionType,
+	ProposalSortingItem,
 	ProposalStatusIdType,
 	ProposalTypeIdType,
 	TableFiltersState,
 } from './types';
+
+const getSelectedKeysArray = (data: Record<string, boolean | undefined>) => {
+	const selectedKeys = Object.entries(data).reduce((acc, [key, val]) => {
+		if (val) {
+			acc.push(key);
+		}
+		return acc;
+	}, [] as string[]);
+
+	return selectedKeys?.length ? selectedKeys : null;
+};
+
+const createQueryParamsFromQueryObject = (filters: ProposalQueryObjectType) => {
+	const newQuery = new URLSearchParams();
+	Object.entries(filters).forEach(([key, value]) => {
+		if (Array.isArray(value)) {
+			if (value.length) {
+				newQuery.set(key, JSON.stringify(value));
+			}
+		} else if (value) {
+			if (typeof value === 'object') {
+				if (Object.keys(value).length) {
+					newQuery.set(key, JSON.stringify(value));
+				}
+			} else {
+				newQuery.set(key, JSON.stringify(value));
+			}
+		}
+	});
+	return newQuery.toString();
+};
 
 function deepMerge(target: unknown, source: unknown, depth: number = 5): unknown {
 	if (depth === 0 || !source || !target || typeof target !== 'object' || typeof source !== 'object') {
@@ -64,11 +99,19 @@ const initialState: TableFiltersState = {
 	},
 	sorting: [],
 
+	//
+	queryObject: {},
+	prevQueryObjectString: '',
+	//
 	showedFiltersOrder: [],
-	fetchedRowsByFilters: [],
+	fetchRowState: {
+		fetchedRowsIsLoading: false,
+		fetchedRowsByFilters: [],
+		fetchedRowsError: null,
+	},
 };
 
-const createNewState = <KeysType extends string>({
+const createNewFilterState = <KeysType extends string>({
 	oldState,
 	listForWork,
 	stateForAll,
@@ -78,8 +121,10 @@ const createNewState = <KeysType extends string>({
 	stateForAll?: ProposalSetFilterActionType<KeysType>[1];
 }): ProposalFilterRecordType<KeysType> => {
 	const newTypeState = {...oldState};
-	// const newList = action.payload[0];
-	// const stateForAll = action.payload[1];
+
+	if (listForWork.length === 0 && stateForAll == false) {
+		return {} as ProposalFilterRecordType<KeysType>;
+	}
 
 	listForWork.forEach(({id, val}) => {
 		newTypeState[id] = stateForAll !== undefined ? stateForAll : val;
@@ -98,116 +143,26 @@ const tableSlice = createSlice({
 	name: 'table',
 	initialState,
 	reducers: {
-		setStatus: (
-			state,
-			// action: PayloadAction<[{key: ProposalStatusIdType; val: boolean}[], stateForAll?: true | false]>,
-			action: PayloadAction<ProposalSetFilterActionType<ProposalStatusIdType>>,
-		) => {
-			// console.log('redux set status');
-			state.filters.status = createNewState({
+		setStatus: (state, action: PayloadAction<ProposalSetFilterActionType<ProposalStatusIdType>>) => {
+			state.filters.status = createNewFilterState({
 				oldState: state.filters.status,
 				listForWork: action.payload[0],
 				stateForAll: action.payload[1],
 			});
-			// const newStatus = {...state.filters.status};
-			// const newList = action.payload[0];
-			// const stateForAll = action.payload[1];
-			// // if (stateForAll === false) {
-			// // 	state.filters.status = {};
-			// // 	return;
-			// // }
-			// newList.forEach(({id, val}) => {
-			// 	newStatus[id] = stateForAll !== undefined ? stateForAll : val;
-			// });
-			// // state.filters.status = newStatus;
-
-			// state.filters.status = newList.reduce(
-			// 	(acc, {id, val}) => {
-			// 		if (val) {
-			// 			acc[id] = val;
-			// 		}
-			// 		return acc;
-			// 	},
-			// 	{} as FiltersState['filters']['status'],
-			// );
-
-			// const newState = Object.entries(action.payload).reduce(
-			// 	(acc, [key, value]) => {
-			// 		if (value) {
-			// 			acc[key as ProposalStatusIdType] = value;
-			// 		}
-			// 		return acc;
-			// 	},
-			// 	{} as FiltersState['filters']['status'],
-			// );
-
-			// state.filters.status = newState;
 		},
-		setType: (
-			state,
-			//
-			action: PayloadAction<ProposalSetFilterActionType<ProposalTypeIdType>>,
-		) => {
-			state.filters.type = createNewState({
+		setType: (state, action: PayloadAction<ProposalSetFilterActionType<ProposalTypeIdType>>) => {
+			state.filters.type = createNewFilterState({
 				oldState: state.filters.type,
 				listForWork: action.payload[0],
 				stateForAll: action.payload[1],
 			});
-			// const newTypeState = {...state.filters.type};
-			// const newList = action.payload[0];
-			// const stateForAll = action.payload[1];
-
-			// newList.forEach(({id, val}) => {
-			// 	newTypeState[id] = stateForAll !== undefined ? stateForAll : val;
-			// });
-
-			// state.filters.type = Object.entries(newTypeState).reduce(
-			// 	(acc, [key, val]) => {
-			// 		if (val) {
-			// 			acc[key as ProposalTypeIdType] = val;
-			// 		}
-			// 		return acc;
-			// 	},
-			// 	{} as FiltersState['filters']['type'],
-			// );
-
-			// state.filters.type = newStatus;
-			// const newStatus = {...state.filters.type};
-			// action.payload.forEach(({key, val}) => {
-			// 	newStatus[key] = val;
-			// });
-			// state.filters.type = newStatus;
-			// const newState = Object.entries(action.payload).reduce(
-			// 	(acc, [key, value]) => {
-			// 		if (value) {
-			// 			acc[key as ProposalTypeIdType] = value;
-			// 		}
-			// 		return acc;
-			// 	},
-			// 	{} as FiltersState['filters']['type'],
-			// );
-
-			// state.filters.type = newState;
-			// state.filters.type = action.payload;
 		},
 		setExecutors: (state, action: PayloadAction<ProposalSetFilterActionType<ProposalExecutorIdType>>) => {
-			state.filters.executor = createNewState({
+			state.filters.executor = createNewFilterState({
 				oldState: state.filters.executor,
 				listForWork: action.payload[0],
 				stateForAll: action.payload[1],
 			});
-			// const newState = Object.entries(action.payload).reduce(
-			// 	(acc, [key, value]) => {
-			// 		if (value) {
-			// 			acc[key] = value;
-			// 		}
-			// 		return acc;
-			// 	},
-			// 	{} as FiltersState['filters']['executor'],
-			// );
-
-			// state.filters.type = newState;
-			// state.filters.executor = action.payload;
 		},
 		setShowedFiltersOrder: (
 			state,
@@ -225,50 +180,108 @@ const tableSlice = createSlice({
 			} else {
 				state.showedFiltersOrder.push(data);
 			}
-			// state.showedFiltersOrder = action.payload;
 		},
-		setFilteredRows: (state, action: PayloadAction<TableFiltersState['fetchedRowsByFilters']>) => {
-			state.fetchedRowsByFilters = action.payload;
-		},
+		// setFilteredRows: (state, action: PayloadAction<TableFiltersState['fetchedRowsByFilters']>) => {
+		// 	state..fetchedRowsByFilters = action.payload;
+		// },
 		setSorting: (state, action: PayloadAction<TableFiltersState['sorting']>) => {
-			// action.payload?.forEach(([fieldName, direction ]) => {
-			// 	const
-			// })
 			state.sorting = action.payload?.filter((i) => i[1] !== undefined) || [];
 		},
+		setQueryObject: (state) => {
+			const notEmptyFilters = Object.entries(state.filters).reduce(
+				(acc, [key, val]) => {
+					const arr = getSelectedKeysArray(val);
+					if (arr) {
+						acc[key] = arr;
+					}
+					return acc;
+				},
+				{} as Record<string, string[]>,
+			);
+
+			const definedSorting = !state.sorting
+				? []
+				: state.sorting.reduce(
+						(acc, [colName, direction]) => {
+							if (direction) {
+								acc.push([colName, direction]);
+							}
+							return acc;
+						},
+						[] as [ProposalSortingItem[0], Exclude<ProposalSortingItem[1], undefined>][],
+					);
+			state.queryObject = {filters: notEmptyFilters, ...(definedSorting.length ? {sorting: definedSorting} : {})};
+			console.log('state.queryObject', state.queryObject);
+		},
+		// fetchRowsByQuery: (
+		// 	state,
+		// 	action: PayloadAction<{testData?: string; manualQueryObject?: ProposalQueryObjectType}>,
+		// ) => {
+		// 	console.log('fetchRowsByQuery: ', action.payload.testData);
+		// 	const queryString = createQueryParamsFromQueryObject(
+		// 		action.payload?.manualQueryObject || state.queryObject,
+		// 	);
+
+		// 	// fetchLogic
+
+		// 	// state.fetchedRowsByFilters = suc;
+		// },
 	},
 	extraReducers: (builder) => {
-		builder.addCase('persist/REHYDRATE', (state, action) => {
-			// console.log('persist/REHYDRATE');
-			const typedAction = action as PayloadAction<{table: TableFiltersState}>;
-			const incomingState = typedAction.payload?.table || {};
-			// console.log('start', initialState);
+		builder
+			.addCase('persist/REHYDRATE', (state, action) => {
+				// console.log('persist/REHYDRATE');
+				const typedAction = action as PayloadAction<{table: TableFiltersState}>;
+				const incomingState = typedAction.payload?.table || {};
+				// console.log('start', initialState);
 
-			const result = deepMerge(incomingState, initialState, 5) as TableFiltersState;
+				const result = deepMerge(incomingState, initialState, 5) as TableFiltersState;
 
-			result.sorting = incomingState.sorting || [];
+				result.sorting = incomingState.sorting || [];
 
-			const filtersKeys = Object.keys(result.filters) as FiltersNamesType[];
-			// for (const filterKey of filtersKeys) {
-			// 	const validator = validatorMap?.[filterKey] as (i: string) => boolean;
-			// 	if (validator && result.filters[filterKey].length) {
-			// 		// @ts-expect-error it will be the same types because filterKey is the same
-			// 		result.filters[filterKey] = result.filters[filterKey].filter(validator);
-			// 	}
-			// }
+				const filtersKeys = Object.keys(result.filters) as FiltersNamesType[];
+				// for (const filterKey of filtersKeys) {
+				// 	const validator = validatorMap?.[filterKey] as (i: string) => boolean;
+				// 	if (validator && result.filters[filterKey].length) {
+				// 		// @ts-expect-error it will be the same types because filterKey is the same
+				// 		result.filters[filterKey] = result.filters[filterKey].filter(validator);
+				// 	}
+				// }
 
-			// if (result.showedFiltersOrder.length) {
-			// 	result.showedFiltersOrder = result.showedFiltersOrder.filter((i) => {
-			// 		return result.filters[i].length && result.filters[i].length > 0;
-			// 	});
-			// }
+				// if (result.showedFiltersOrder.length) {
+				// 	result.showedFiltersOrder = result.showedFiltersOrder.filter((i) => {
+				// 		return result.filters[i].length && result.filters[i].length > 0;
+				// 	});
+				// }
 
-			return result;
-		});
+				return result;
+			})
+			.addCase(fetchRowsByQuery.pending, (state) => {
+				state.fetchRowState.fetchedRowsIsLoading = true;
+				state.fetchRowState.fetchedRowsError = null;
+			})
+			.addCase(fetchRowsByQuery.fulfilled, (state, action) => {
+				state.fetchRowState.fetchedRowsIsLoading = false;
+				state.fetchRowState.fetchedRowsError = null;
+				if (action.payload.isQueryStringTheSame) return; // TODO чтобы даже pending не вызывался
+				state.fetchRowState.fetchedRowsByFilters = action.payload.data;
+				state.prevQueryObjectString = action.payload.prevQueryObjectString;
+			})
+			.addCase(fetchRowsByQuery.rejected, (state, action) => {
+				state.fetchRowState.fetchedRowsIsLoading = false;
+				// state.fetchRowState.fetchedRowsError = action.payload;
+				if (action.payload) {
+					// Since we passed in `MyKnownError` to `rejectValue` in `updateUser`, the type information will be available here.
+					state.fetchRowState.fetchedRowsError = action.payload;
+				} else {
+					state.fetchRowState.fetchedRowsError = action.error.message || 'Unknown error';
+				}
+				// console.error('Error fetching rows:', action.payload);
+			});
 	},
 });
 
-export const {setStatus, setType, setExecutors, setFilteredRows} = tableSlice.actions;
+// export const {setStatus, setType, setExecutors, setFilteredRows} = tableSlice.actions;
 export const tableActions = tableSlice.actions;
 
 export const tableReducer = tableSlice.reducer;

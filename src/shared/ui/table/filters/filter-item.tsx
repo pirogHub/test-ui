@@ -66,7 +66,7 @@ export const FilterItem = <T extends BaseItemType>({
 	openWhenCreate,
 	closeWhenSelect,
 	isDataLoading,
-	errorDataLoading,
+	errorDataLoading, // TODO
 	initialState,
 	onSubmitFilters,
 	onDropFilters,

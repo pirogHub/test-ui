@@ -61,7 +61,7 @@ function createData(
 	};
 }
 
-const labelDictionary: Record<keyof Data, string> & {
+const labelDictionary: Record<keyof Data | 'executorName', string> & {
 	rejectButton: string;
 } = {
 	id: 'ID',
@@ -69,7 +69,9 @@ const labelDictionary: Record<keyof Data, string> & {
 	createdAt: 'Дата создания',
 	status: 'Статус',
 	type: 'Тип',
-	executor: 'Исполнитель',
+	executor: 'Исполнитель', // TODO
+	executorName: 'Исполнитель',
+
 	rejectButton: '',
 };
 
@@ -448,12 +450,14 @@ const getEmptyRows = (count: number) => {
 	});
 };
 
+const AllowedColumnKeys = ['id', 'createdAt', 'appNumber', 'status', 'type', 'executorName'];
+
 const ColumnAutosizing = () => {
 	const apiRef = useGridApiRef();
 	// const data = useData(100);
 
 	const {tableStore} = useCustomStore();
-	const {fetchedRowsByFilters, getFilteredRowsIsLoading, sorting, setSorting} = tableStore;
+	const {fetchedRowsByFilters, fetchedRowsIsLoading, fetchedRowsError, sorting, setSorting} = tableStore;
 
 	const sizablefetchedRowsByFilters = React.useMemo(() => {
 		const isNeed = fetchedRowsByFilters.length < 5;
@@ -477,7 +481,7 @@ const ColumnAutosizing = () => {
 
 	const headerKeys = React.useMemo(() => {
 		if (
-			getFilteredRowsIsLoading ||
+			fetchedRowsIsLoading ||
 			!fetchedRowsByFilters ||
 			!fetchedRowsByFilters?.length ||
 			!fetchedRowsByFilters[0]
@@ -485,12 +489,12 @@ const ColumnAutosizing = () => {
 			return [];
 		}
 		return Object.keys(fetchedRowsByFilters?.[0]);
-	}, [fetchedRowsByFilters, getFilteredRowsIsLoading]);
+	}, [fetchedRowsByFilters, fetchedRowsIsLoading]);
 
 	const [isWithReject, setIsWithReject] = React.useState(true);
 	const columns = React.useMemo(() => {
 		if (
-			getFilteredRowsIsLoading ||
+			fetchedRowsIsLoading ||
 			!fetchedRowsByFilters ||
 			!fetchedRowsByFilters?.length ||
 			!fetchedRowsByFilters[0]
@@ -507,7 +511,8 @@ const ColumnAutosizing = () => {
 			];
 			return loading;
 		}
-		const keys = Object.keys(fetchedRowsByFilters?.[0]);
+		// const keys = Object.keys(fetchedRowsByFilters?.[0]); // TODO
+		const keys = [...AllowedColumnKeys];
 		if (isWithReject) {
 			keys.push('rejectButton');
 		}
@@ -544,7 +549,7 @@ const ColumnAutosizing = () => {
 				};
 				return item;
 			});
-	}, [fetchedRowsByFilters, sorting, getFilteredRowsIsLoading, isWithReject]);
+	}, [fetchedRowsByFilters, sorting, fetchedRowsIsLoading, isWithReject]);
 
 	const router = useRouter();
 
@@ -578,7 +583,7 @@ const ColumnAutosizing = () => {
 
 						footer: () => (
 							<CustomFooterStatusComponent
-								disabled={getFilteredRowsIsLoading}
+								disabled={fetchedRowsIsLoading}
 								pageSizeOptions={[5, 10, 25]}
 							/>
 						),
@@ -616,9 +621,9 @@ const ColumnAutosizing = () => {
 					// 	{id: '1', key: 'skeleton'},
 					// 	{id: '2', key: 'skeleton'},
 					// ]}
-					loading={getFilteredRowsIsLoading}
+					loading={fetchedRowsIsLoading}
 					// @ts-expect-error toremove
-					rows={getFilteredRowsIsLoading ? LoadingSkeletons : sizablefetchedRowsByFilters}
+					rows={fetchedRowsIsLoading ? LoadingSkeletons : sizablefetchedRowsByFilters}
 					// rows={LoadingSkeletons}
 					initialState={{
 						pagination: {paginationModel: {pageSize: 5}},
@@ -633,7 +638,7 @@ const ColumnAutosizing = () => {
 const CTable = () => {
 	return (
 		<>
-			<Filters />
+			{/* <Filters /> */}
 			<ColumnAutosizing />
 		</>
 	);

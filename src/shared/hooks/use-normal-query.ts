@@ -1,14 +1,16 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {useDebounce} from './use-debounce';
 
 type NormalQueryProps<FetchArgs, FetchedDataType> = {
-	queryKey: FetchArgs;
+	queryKey: FetchArgs; // TODO если ставить как в ревльном queryKey [key1, key2], то вызывается бесконечный перерендер
+	// queryKey: string;
 	queryFn: (fetchArgs: FetchArgs) => FetchedDataType;
 	onSuccess?: (data: Awaited<FetchedDataType>) => void;
 	onError?: (error: {message: string}) => void;
 	fetchOnMount?: boolean;
 	disableAutoFetchByChangedQueryKey?: boolean;
+	timeoutBeforeMountFetch?: number;
 	// transformData?: (data: FetchedDataType) => any;
 };
 
@@ -19,13 +21,30 @@ export const useNormalQuery = <FetchArgs, FetchedDataType>({
 	onError,
 	fetchOnMount,
 	disableAutoFetchByChangedQueryKey,
+	timeoutBeforeMountFetch,
 	// transformData,
 }: NormalQueryProps<FetchArgs, FetchedDataType>) => {
-	const {debouncedValue: queryKeyDebounced, isDebounceLoading} = useDebounce(queryKey, 1000);
+	const [fakeMemoizedQuery, setFakeMemoizedQuery] = useState(queryKey);
+
+	const prevQueryKey = useRef(queryKey);
+
+	useEffect(() => {
+		console.log('compare'); // TODO что использует реальный useQuery?
+
+		const jsonPrev = JSON.stringify(prevQueryKey.current);
+		const newQueryKey = JSON.stringify(queryKey);
+		if (jsonPrev !== newQueryKey) {
+			prevQueryKey.current = queryKey;
+			setFakeMemoizedQuery(queryKey);
+		}
+	}, [queryKey]);
+
+	const {debouncedValue: queryKeyDebounced, isDebounceLoading} = useDebounce(fakeMemoizedQuery, 1000); // TODO добавить проверку ключей, так как если передавать массив, то массив же пересобирается и бесконечный фетч идет
+
 	const queryKeyRef = useRef(queryKeyDebounced);
 	queryKeyRef.current = queryKeyDebounced;
 
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(fetchOnMount ? true : false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [data, setData] = useState<FetchedDataType | null>(null);
@@ -51,7 +70,7 @@ export const useNormalQuery = <FetchArgs, FetchedDataType>({
 				console.log('queryKeyRef.current', queryKeyRef.current);
 
 				const res = await queryFn(queryKeyRef.current);
-				// const transformedData = transformData ? transformData(res) : res;
+				// const transformedData = transformData ? transformData(res) : res; // TODO добавить transform с выкидыванием ошибки если data не ок
 				setData(res);
 				onSuccessRef.current?.(res);
 				setIsSuccess(true);
@@ -67,10 +86,21 @@ export const useNormalQuery = <FetchArgs, FetchedDataType>({
 		[queryKeyRef, queryFn, disableAutoFetchByChangedQueryKey, onSuccessRef, onErrorRef],
 	);
 
+	const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+
 	useEffect(() => {
 		if (fetchOnMount) {
-			fetchByQuery().catch(() => {});
+			if (timeoutIdRef.current) {
+				console.log('useNormalQuery: two mounts at the same time?');
+			}
+			timeoutIdRef.current = setTimeout(() => {
+				fetchByQuery().catch(() => {});
+			}, timeoutBeforeMountFetch || 0);
 		}
+		return () => {
+			if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+			timeoutIdRef.current = null;
+		};
 	}, [fetchByQuery, fetchOnMount]);
 
 	useEffect(() => {

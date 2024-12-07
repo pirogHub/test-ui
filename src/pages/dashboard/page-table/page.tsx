@@ -2,6 +2,7 @@ import React from 'react';
 
 import {Header} from '@/components/header';
 import {SkyHeader} from '@/widgets';
+import {FiltersCreator} from '@/widgets/filters/filters-creator';
 import {styled} from '@mui/material';
 
 import {CTable} from '@/shared/ui/table';
@@ -43,6 +44,14 @@ const PageDescription = styled('div')`
 	}
 `;
 
+const ddd = [
+	{id: 1, name: '1'},
+	{id: 2, name: '2'},
+	{id: 3, name: '3'},
+	{id: 4, name: '4'},
+	{id: 5, name: '5'},
+];
+
 const Page = () => {
 	return (
 		<>
@@ -53,7 +62,15 @@ const Page = () => {
 					<h2>Мои заявки</h2>
 					<p>Здесь отображаются все созданные вами заявки</p>
 				</PageDescription>
-				<CTable />
+				<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'start', gap: '20px'}}>
+					<FiltersCreator />
+					<CTable />
+					{/* {ddd.map(({id}) => {
+						console.log(id);
+
+						return <div key={id}>{id}</div>;
+					})} */}
+				</div>
 			</Content>
 		</>
 	);

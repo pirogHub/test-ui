@@ -1,6 +1,6 @@
 import {useCallback, useEffect} from 'react';
 
-import {api} from '@/api/base';
+import {MyBaseApi} from '@/api/base';
 import {useMutation, useQuery} from '@tanstack/react-query';
 
 import {useAppDispatch, useAppSelector} from './store';
@@ -15,7 +15,7 @@ export const useUserStore = () => {
 		error: loginError,
 	} = useMutation({
 		mutationKey: ['login'],
-		mutationFn: api.login,
+		mutationFn: MyBaseApi.login,
 
 		onSuccess: (userData) => {
 			dispatch(setUser(userData.user));
@@ -32,7 +32,7 @@ export const useUserStore = () => {
 		isSuccess: getUserIsSuccess,
 	} = useQuery({
 		queryKey: ['user'],
-		queryFn: api.getUser,
+		queryFn: MyBaseApi.getUser,
 		retryOnMount: false,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,

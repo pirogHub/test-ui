@@ -29,16 +29,33 @@ export const ProposalExecutorSchema = z.object({
 });
 export type ProposalExecutorType = z.infer<typeof ProposalExecutorSchema>;
 
+export type ProposalSortingItem = [string, 'asc' | 'desc' | undefined];
+
+export type FiltersNamesType = keyof TableFiltersState['filters'];
+
+export type ProposalQueryObjectType = Record<
+	string,
+	| Exclude<ProposalSortingItem, undefined>[]
+	//
+	| Partial<ProposalFilterRecordType<FiltersNamesType>>
+>;
+
 export type TableFiltersState = {
 	filters: {
 		type: ProposalFilterRecordType<ProposalTypeIdType>;
 		status: ProposalFilterRecordType<ProposalStatusIdType>;
 		executor: ProposalFilterRecordType<ProposalExecutorIdType>;
 	};
-	sorting?: [string, 'asc' | 'desc' | undefined][]; // TODO
+	sorting?: ProposalSortingItem[]; // TODO
 
+	//
+	queryObject: ProposalQueryObjectType;
+	prevQueryObjectString: string;
 	showedFiltersOrder: FiltersNamesType[];
-	fetchedRowsByFilters: unknown[]; // TODO
+	// fetchedRowsByFilters: unknown[]; // TODO
+	fetchRowState: {
+		fetchedRowsIsLoading: boolean;
+		fetchedRowsByFilters: unknown[]; // TODO
+		fetchedRowsError: string | null; // TODO
+	};
 };
-
-export type FiltersNamesType = keyof TableFiltersState['filters'];

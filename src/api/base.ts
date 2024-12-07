@@ -23,12 +23,12 @@ apiClient.interceptors.request.use((config) => {
 });
 
 // Запросы для двух разных ролей
-export const api = {
+export const MyBaseApi = {
 	getUser: async (): Promise<User> => {
 		const response = await axios.get<User>('/api/get-user');
 
 		if (response.status !== 200) {
-			throw new Error('user error');
+			throw new Error('error when fetching user: getUser error');
 		}
 
 		return response.data;
@@ -38,7 +38,7 @@ export const api = {
 		const response = await axios.post<LoginResponse>('/api/login', {email, password});
 
 		if (response.status !== 200) {
-			throw new Error('Login failed');
+			throw new Error('error when fetching: Login failed');
 		}
 
 		return response.data;
@@ -46,7 +46,7 @@ export const api = {
 
 	fetchFilteredRows: async (
 		query: string,
-	): Promise<{type: 'success'; data: unknown} | {type: 'error'; data: unknown}> => {
+	): Promise<{type: 'success'; data: unknown[]} | {type: 'error'; data: unknown}> => {
 		console.log('fetchFilteredRows');
 
 		try {
@@ -56,7 +56,7 @@ export const api = {
 			const response = await axios.get<unknown[]>('/api/fetch-filtered-rows?' + query);
 
 			if (response.status !== 200) {
-				throw new Error('user error');
+				throw new Error('error when fetching filteredRows: fetchFilteredRows');
 			}
 			return {type: 'success', data: response.data};
 		} catch (error) {
@@ -65,13 +65,15 @@ export const api = {
 			return {type: 'error', data: error};
 		}
 	},
-	fetchExecutors: async (): Promise<{type: 'success'; data: string[]} | {type: 'error'; data: unknown}> => {
+	fetchExecutors: async (): Promise<
+		{type: 'success'; data: {id: number; key: string; name: string}[]} | {type: 'error'; data: unknown}
+	> => {
 		try {
 			// const response = await axios.get<any[]>('/api/fetch-filtered-rows' + query);
-			const response = await axios.get<string[]>('/api/fetch-executors');
+			const response = await axios.get<{id: number; key: string; name: string}[]>('/api/fetch-executors');
 
 			if (response.status !== 200) {
-				throw new Error('user error');
+				throw new Error('error when fetching executors: fetchExecutors');
 			}
 			return {type: 'success', data: response.data};
 		} catch (error) {

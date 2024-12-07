@@ -7,6 +7,7 @@ import {persistReducer, persistStore} from 'redux-persist';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 
 import {proposalReducer} from './proposal.slice';
+import {queryObjectMiddleware} from './table.middleware';
 import {tableReducer} from './table.slice';
 import {userReducer} from './user.slice';
 
@@ -50,7 +51,8 @@ export const store = configureStore({
 			serializableCheck: {
 				ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'], // Игнорируем эти действия
 			},
-		}),
+		}).prepend(queryObjectMiddleware.middleware),
+	//.concat(queryObjectMiddleware),
 });
 
 // Экспорт persistor для управления состоянием

@@ -86,16 +86,17 @@ export const NewFilter = <
 	openWhenCreate,
 	noCheckbox,
 }: NewFilterProps<FilterItemKeyType, AllListItemType>) => {
-	// const alreadySelected: Record<string, boolean> = {};
-
 	const [filteredDataToShow, setFilteredDataToShow] = React.useState(allList);
 
-	// popup settings
+	useEffect(() => {
+		setFilteredDataToShow(allList);
+	}, [allList]);
+
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
 	const anchorElRef = React.useRef<HTMLButtonElement | null>(null);
 	const anchorEl = anchorElRef.current;
 
-	const onSelectItem = (e: React.MouseEvent<HTMLUListElement, MouseEvent>) => {
+	const onSelectItem = useCallback((e: React.MouseEvent<HTMLUListElement, MouseEvent>) => {
 		const target = e.target as HTMLElement;
 
 		const item = target.closest('[data-select-item-id]');
@@ -107,7 +108,7 @@ export const NewFilter = <
 		if (closeWhenSelect) {
 			setIsPopupOpen(false);
 		}
-	};
+	}, []);
 
 	const allCheckedCount = useMemo(
 		() => (alreadySelected ? Object.keys(alreadySelected).length : undefined),
@@ -120,7 +121,6 @@ export const NewFilter = <
 			: 0;
 		console.log('allShowedSelectedCount', allShowedSelectedCount);
 
-		// return filteredDataToShow.length === allShowedSelectedCount;
 		return allShowedSelectedCount;
 	}, [alreadySelected, filteredDataToShow]);
 
@@ -154,10 +154,8 @@ export const NewFilter = <
 			if (select) {
 				onSelect([filteredDataToShow, true]);
 			} else {
-				// onSelect([allList, false]);
 				onSelect([filteredDataToShow, false]);
 			}
-			// closePopup();
 		},
 		[onSelect, filteredDataToShow],
 	);
@@ -179,12 +177,6 @@ export const NewFilter = <
 		}
 	}, [hideIfEmpty, isAllSelected]);
 
-	// useEffect(() => {
-	// 	if (openWhenCreate && anchorElRef.current) {
-	// 		setIsPopupOpen(true);
-	// 	}
-	// }, [openWhenCreate, anchorElRef]);
-
 	useEffect(() => {
 		// toremove
 		if (openWhenCreate) {
@@ -197,11 +189,14 @@ export const NewFilter = <
 		if (allCheckedCount !== 0) setCheckedCountFreezeBeforeClose(allCheckedCount);
 	}, [allCheckedCount]);
 
+	useEffect(() => {
+		return () => setIsPopupOpen(false);
+	}, []);
+
 	if (hideIfEmpty && isAllSelected) return null;
 	return (
 		<FilterRoot>
 			<FilterButton
-				// sx={sxButton}
 				ref={anchorElRef}
 				onClick={() => {
 					setIsPopupOpen(true);
@@ -223,7 +218,7 @@ export const NewFilter = <
 				id={isPopupOpenSafe ? `popup-menu-${filterId}` : undefined}
 				open={isPopupOpenSafe}
 				// @ts-expect-error toremove
-				anchorEl={() => anchorElRef.current || null}
+				anchorEl={() => anchorElRef.current || null} // TODO подумать над оптимизацией
 				onClose={closePopup}
 				anchorOrigin={popoverAnchorOrigin}
 				sx={{
@@ -257,7 +252,6 @@ export const NewFilter = <
 				{!noFooterActions && (
 					<FilterFooter
 						disableButtons={isDataLoading}
-						// disableFilterDrop={allCheckedCount === 0}
 						disableFilterDrop={allShowedCheckedCount === 0}
 						onSubmitFilter={() => {
 							setIsPopupOpen(false);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useMemo} from 'react';
 
 import {ButtonStyled} from '@/components/ui-kit/button/button-styled';
 import {Checkbox, CircularProgress, Popover, styled} from '@mui/material';
@@ -156,16 +156,15 @@ export const ListItems = <
 	renderItem: (item: AllListItemType) => React.ReactNode;
 	onSelectItem: (e: React.MouseEvent<HTMLUListElement, MouseEvent>) => void;
 }) => {
-	if (errorLoadingDataMessage !== undefined) return <div>{errorLoadingDataMessage}</div>;
+	if (errorLoadingDataMessage !== undefined) return <div>Ошибка: {errorLoadingDataMessage}</div>;
 	if (isDataLoading) return <DataLoading />;
-	return allList.length === 0 ? (
+	return allList?.length === 0 ? (
 		<EmptySearchMessage>Пусто</EmptySearchMessage>
 	) : (
 		<ListItemsRoot>
 			<ul onClick={onSelectItem}>
-				{allList.map((item) => {
+				{allList?.map((item) => {
 					const {id, name} = item;
-					// const isChecked = alreadySelected[id] ? '+' : '-';
 					const isCheckedBool = alreadySelected[id];
 					return hideIfChecked && isCheckedBool ? null : (
 						<li data-select-item-id={id} data-select-is-checked={alreadySelected[id] || false} key={id}>

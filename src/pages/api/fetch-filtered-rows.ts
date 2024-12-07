@@ -50,7 +50,8 @@ function createData(
 	appNumber: string,
 	status: StatusTypes,
 	type: string,
-	executor: string,
+	executorName: string,
+	executor: number,
 ) {
 	return {
 		id,
@@ -58,22 +59,23 @@ function createData(
 		appNumber,
 		status,
 		type,
-		executor,
+		executorName,
+		executor: String(executor),
 	};
 }
 type Data = ReturnType<typeof createData>;
 
 const rows: Data[] = [
-	createData(1, 1613573214000, 'APP001', 'analyze', 'inner', 'Иван Иванов'),
-	createData(2, 1623673214000, 'APP002', 'in-work', 'outer', 'Пётр Петров'),
-	createData(3, 1633773214000, 'APP003', 'done', 'inner', 'Сергей Сергеев'),
-	createData(4, 1643873214000, 'APP004', 'specified', 'outer', 'Иван Иванов'),
-	createData(5, 1653973214000, 'APP005', 'rejected', 'inner', 'Иван Иванов'),
-	createData(6, 1664073214000, 'APP006', 'waited', 'outer', 'Пётр Петров'),
-	createData(7, 1674173214000, 'APP007', 'draft', 'inner', 'Сергей Сергеев'),
-	createData(8, 1684273214000, 'APP008', 'analyze', 'outer', 'Сергей Сергеев'),
-	createData(9, 1694373214000, 'APP009', 'in-work', 'inner', 'Николай Николаев'),
-	createData(10, 1704473214000, 'APP010', 'done', 'outer', 'Николай Николаев'),
+	createData(1, 1613573214000, 'APP001', 'analyze', 'inner', 'Иван Иванов', 1),
+	createData(2, 1623673214000, 'APP002', 'in-work', 'outer', 'Пётр Петров', 2),
+	createData(3, 1633773214000, 'APP003', 'done', 'inner', 'Сергей Сергеев', 3),
+	createData(4, 1643873214000, 'APP004', 'specified', 'outer', 'Иван Иванов', 1),
+	createData(5, 1653973214000, 'APP005', 'rejected', 'inner', 'Иван Иванов', 1),
+	createData(6, 1664073214000, 'APP006', 'waited', 'outer', 'Пётр Петров', 2),
+	createData(7, 1674173214000, 'APP007', 'draft', 'inner', 'Сергей Сергеев', 3),
+	createData(8, 1684273214000, 'APP008', 'analyze', 'outer', 'Сергей Сергеев', 3),
+	createData(9, 1694373214000, 'APP009', 'in-work', 'inner', 'Николай Николаев', 4),
+	createData(10, 1704473214000, 'APP010', 'done', 'outer', 'Николай Николаев', 4),
 ];
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<Data[]>) {
