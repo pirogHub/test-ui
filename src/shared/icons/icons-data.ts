@@ -8,6 +8,9 @@ const iconsUrlData = {
 	fileIcon: '/img/icons/file-icon-04.svg',
 	eyeOff: '/img/icons/eye-off.svg',
 	eyeOn: '/img/icons/eye-on.svg',
+	check: '/img/icons/check.svg',
+	chestCircle: '/img/icons/chest-circle.svg',
+	checkCircle: '/img/icons/chest-circle.svg',
 
 	SkyLogo: '/img/brand/Logo.png',
 	sortArrows: '/img/icons/sort-arrows.svg',

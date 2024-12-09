@@ -6,13 +6,16 @@ import {FiltersCreator} from '@/widgets/filters/filters-creator';
 import {styled} from '@mui/material';
 
 import {CTable} from '@/shared/ui/table';
+import {CreateProposal} from '@/shared/ui/table/create-proposal';
 
 const Content = styled('div')`
+	// TODO id=2358923467 занести в layout
 	max-width: ${1344}px;
 	margin: 0 auto;
 `;
 
 const PageDescription = styled('div')`
+	// TODO id=2358923467 занести в layout
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -63,7 +66,10 @@ const Page = () => {
 					<p>Здесь отображаются все созданные вами заявки</p>
 				</PageDescription>
 				<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'start', gap: '20px'}}>
-					<FiltersCreator />
+					<div style={{display: 'flex', justifyContent: 'space-between'}}>
+						<FiltersCreator />
+						<CreateProposal />
+					</div>
 					<CTable />
 					{/* {ddd.map(({id}) => {
 						console.log(id);

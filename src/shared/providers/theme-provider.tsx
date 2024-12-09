@@ -24,7 +24,7 @@ export const CustomThemeProvider: React.FC<PropsWithChildren> = ({children}) => 
 	return (
 		<ThemeToggleContext.Provider value={{isDarkMode, toggleTheme}}>
 			<ThemeProvider theme={currentTheme}>
-				<CssBaseline />
+				{/* <CssBaseline /> */}
 				{children}
 			</ThemeProvider>
 		</ThemeToggleContext.Provider>

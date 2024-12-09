@@ -153,7 +153,7 @@ export const ListItems = <
 	isDataLoading?: boolean;
 	allList: AllListItemType[];
 	alreadySelected: Partial<Record<FilterItemKeyType, boolean>>;
-	renderItem: (item: AllListItemType) => React.ReactNode;
+	renderItem?: (item: AllListItemType) => React.ReactNode;
 	onSelectItem: (e: React.MouseEvent<HTMLUListElement, MouseEvent>) => void;
 }) => {
 	if (errorLoadingDataMessage !== undefined) return <div>Ошибка: {errorLoadingDataMessage}</div>;

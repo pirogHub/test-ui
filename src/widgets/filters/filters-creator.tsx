@@ -154,7 +154,7 @@ export const FiltersCreator = () => {
 				const itData = datasMap[it];
 				if (!itData) return null;
 				let isLoading = false;
-				let isError = false;
+
 				let realData = datasMap[it].data;
 				let errorLoadingDataMessage = undefined;
 				if (it === 'executor') {
@@ -182,7 +182,6 @@ export const FiltersCreator = () => {
 						// allList={itData.data}
 						allList={realData}
 						isDataLoading={isLoading}
-						isError={isError}
 						errorLoadingDataMessage={errorLoadingDataMessage}
 						// @ts-expect-error TODO подумать как правильно описать типы, т к если вместо map писать каждый фильтр вручную, то ошибок типов не будет
 						alreadySelected={filtersData[it]}

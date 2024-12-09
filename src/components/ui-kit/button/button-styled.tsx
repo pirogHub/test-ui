@@ -17,8 +17,10 @@ interface RootProps {
 const getButtonSize = (size: ButtonSize, isRounded?: boolean, isOnlyIcon?: boolean): CSSObject => {
 	const sizeStylesXl = {
 		height: '56px',
+		width: '56px',
 		borderRadius: isRounded ? '50%' : '12px',
-		padding: isOnlyIcon || isRounded ? '0 16px' : '0 36px',
+		// padding: isOnlyIcon || isRounded ? '0 16px' : '0 36px', // TODO проверить как с круглой будет
+		padding: isOnlyIcon || isRounded ? '0' : '0 36px',
 		lineHeight: '20px',
 		fontWeight: '600',
 		fontSize: '16px',
@@ -27,7 +29,9 @@ const getButtonSize = (size: ButtonSize, isRounded?: boolean, isOnlyIcon?: boole
 		case 's':
 			return {
 				height: '32px',
+				...(isOnlyIcon ? {width: '32px'} : null),
 				borderRadius: isRounded ? '50%' : '8px',
+				// padding: isOnlyIcon || isRounded ? '0 10px' : '0 24px',
 				padding: isOnlyIcon || isRounded ? '0 10px' : '0 24px',
 				lineHeight: '20px',
 				fontWeight: '600',
@@ -37,7 +41,9 @@ const getButtonSize = (size: ButtonSize, isRounded?: boolean, isOnlyIcon?: boole
 		case 'm':
 			return {
 				height: '40px',
+				...(isOnlyIcon ? {width: '40px'} : null),
 				borderRadius: isRounded ? '50%' : '10px',
+				// padding: isOnlyIcon || isRounded ? '0 10px' : '0 24px',
 				padding: isOnlyIcon || isRounded ? '0 10px' : '0 24px',
 				lineHeight: '20px',
 				fontWeight: '600',
@@ -72,6 +78,7 @@ const Root = styled('button', {
 	hover?: boolean;
 	isRounded?: boolean;
 }>(({theme, view, isRounded, size, isOnlyIcon, overrideColorName}) => {
+	//
 	const map = (theme as skyAllianceMUITheme).skyAlliance.colors[view];
 	const overrideColor = overrideColorName ? (theme as skyAllianceMUITheme).colors[overrideColorName] : undefined;
 	const sizeStyles = getButtonSize(size, isRounded, isOnlyIcon);
@@ -117,10 +124,11 @@ const Root = styled('button', {
 	};
 });
 
-export interface ButtonProps extends Omit<React.ComponentProps<typeof Root>, Exclude<keyof RootProps, 'sx'>> {
+export interface ButtonProps
+	extends Omit<React.ComponentProps<typeof Root>, Exclude<keyof RootProps, 'sx'> | 'isOnlyIcon'> {
 	view?: ButtonView;
 	size?: ButtonSize;
-	leftIcon?: React.ReactNode;
+	// leftIcon?: React.ReactNode;
 	rightIcon?: React.ReactNode;
 	onClick?: React.MouseEventHandler<HTMLButtonElement>;
 	color?: SkyAllianceBaseColorsNamesType;

@@ -390,7 +390,7 @@ const StyledDataGrid = styled(DataGrid)(({theme}) => {
 			cursor: 'pointer',
 			'--rowBorderColor': `${colors.base4} !important`,
 			backgroundColor: colors.base1,
-			'--height': '50px',
+			'--height': '50px', // TODO посмотреть на sky-tooltip как там перезаписываются классы
 			'&:hover': {
 				backgroundColor: colors.base5,
 			},
@@ -560,7 +560,7 @@ const ColumnAutosizing = () => {
 					onRowClick={({...data}, e) => {
 						const row = data.row as Data;
 
-						router.push(`/application/${row.appNumber}`).catch(() => {});
+						router.push(`/proposal/one/${row.appNumber}`).catch(() => {});
 					}}
 					apiRef={apiRef}
 					density="standard"

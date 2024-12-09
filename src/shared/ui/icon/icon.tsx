@@ -80,6 +80,7 @@ const getIconStyles = (p: IconProps2, theme: skyAllianceMUITheme) => {
 };
 
 const Root = styled('div', {
+	label: 'SkyIcon',
 	shouldForwardProp: (propName) =>
 		propName !== 'size' &&
 		propName !== 'url' &&

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import '@/styles/globals.css';
+import {CssBaseline} from '@mui/material';
 import type {AppProps} from 'next/app';
 
 import MainProvider from '@/shared/providers/main-provider';

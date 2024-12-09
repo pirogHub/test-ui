@@ -216,7 +216,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 			isDisabled,
 			...props
 		},
-		inputRefForwarded,
+		ref,
 	) => {
 		const [value, setValue] = useState(String(props.value || '') || '');
 		const [isFocused, setIsFocused] = useState(_isFocusedManual);
@@ -238,14 +238,14 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 		}, [onChangeValue, debouncedValue]);
 
 		useEffect(() => {
-			if (inputRefForwarded) {
-				if (typeof inputRefForwarded === 'function') {
-					inputRefForwarded(inputRef.current);
+			if (ref) {
+				if (typeof ref === 'function') {
+					ref(inputRef.current);
 				} else {
-					inputRef.current = inputRefForwarded.current;
+					inputRef.current = ref.current;
 				}
 			}
-		}, [inputRefForwarded]);
+		}, [ref]);
 		useEffect(() => {
 			if (inputRef.current) {
 				detectAutofill(inputRef.current)
@@ -258,11 +258,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 					.catch(() => {});
 			}
 		}, [inputRef, onAutoFill]);
-
-		// useEffect(() => {
-		// 	propsOnChange({target: {value: 'test'}}).catch(console.error);
-		// }, [propsOnChange]);
-
 		return (
 			<RowsWrapper sx={sxWrapper}>
 				<Root
@@ -291,41 +286,23 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 							<FormFieldInput
 								as={inputAs}
 								value={value}
-								// {...props}
+								{...props}
 								sizeInput={sizeInput}
 								placeholder=""
-								// ref={inputRef}
+								// ref={ref}
+								ref={inputRef}
 								onFocus={(e) => {
-									props?.onFocus?.({
-										...e,
-										target: {
-											...e.target,
-											name: props.name || '',
-										},
-									});
+									props?.onFocus?.(e);
 									setIsFocused(true);
 								}}
 								onBlur={(e) => {
-									props?.onBlur?.({
-										...e,
-										target: {
-											...e.target,
-											name: props.name || '',
-										},
-									});
+									props?.onBlur?.(e);
 
 									setIsFocused(false);
 								}}
 								onChange={(e) => {
 									setValue(e.target.value);
-									// props.onChange?.(e);
-									props.onChange?.({
-										...e,
-										target: {
-											...e.target,
-											name: props.name || '',
-										},
-									});
+									props.onChange?.(e);
 									setIsAutofilled(false);
 								}}
 							/>
